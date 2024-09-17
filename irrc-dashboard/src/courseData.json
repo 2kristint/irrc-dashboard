@@ -1,0 +1,11 @@
+{
+    "courses" : [
+        {"name" : "Dyslexia Overview", "key" : 1, "id" : 1, "desc" : ""},
+        {"name" : "Literacy Skills Associated with Dyslexia", "key" : 2, "id" : 2, "desc" : ""},
+        {"name" : "IRRC", "key" : 3, "id" : 3, "desc" : ""},
+        {"name" : "Effective Literacy Instruction", "key" : 4, "id" : 4, "desc" : ""},
+        {"name" : "Small-Group Instruction", "key" : 5, "id" : 5, "desc" : ""},
+        {"name" : "Structured Literacy", "key" : 6, "id" : 6, "desc" : ""},
+        {"name" : "Grapheme-Phoneme Mapping", "key" : 7, "id" : 7, "desc" : ""}
+    ]
+}
