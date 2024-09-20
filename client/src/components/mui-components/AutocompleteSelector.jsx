@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Autocomplete, Button, Box, TextField } from '@mui/material';
-import courseData from '~/courseData.json';
 
-const Selector = ({ onSelect, selectedCourses }) => {
+const Selector = ({ onSelect, selectedCourses, data }) => {
 
   const [value, setValue] = useState(null);
 
@@ -16,8 +15,8 @@ const Selector = ({ onSelect, selectedCourses }) => {
       sx={{ display: 'flex'}}
     >
       <Autocomplete
-        options={courseData.courses.filter(course => !selectedCourses.includes(course))}
-        getOptionLabel={(option) => option.name}
+        options={data.courseNames.filter(course => !selectedCourses.includes(course))}
+        getOptionLabel={(option) => option.fullname}
         style={{ width: 300 }}
         value={value} 
         onChange={(event, newValue) => {

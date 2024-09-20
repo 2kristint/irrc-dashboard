@@ -44,20 +44,35 @@ app.get('/api/data', async (req, res) => {
         });
 
         const query3 = new Promise((resolve, reject) => {
-            db.query('SELECT 0 AS user_count;', (err, results) => {
+            db.query('SELECT fullname FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
+        const query4 = new Promise((resolve, reject) => {
+            db.query(`SELECT c.fullname AS course_name,
+                            COUNT(*) AS total_users,
+                            COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) AS completed_users
+                        FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
+                        JOIN dbgyt2oi9llwgg.mdlxk_course c
+                            ON cc.course = c.id
+                        GROUP BY c.fullname;`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+
         // Wait for all queries to complete
-        const [userTypes, userZipcodes, user_info_data] = await Promise.all([query1, query2, query3]);
+        const [userTypes, userZipcodes, courseNames, enrollmentData] = await Promise.all([query1, query2, query3, query4]);
 
         // Send combined response as JSON
         res.json({
             userTypes,
             userZipcodes,
-            user_info_data,
+            courseNames,
+            enrollmentData
         });
 
     } catch (err) {

@@ -12,13 +12,19 @@ import Footer from './components/layout/Footer.jsx'
 import Navbar from './components/layout/Navbar.jsx'
 import CourseSpecificReport from './components/CourseSpecificReport.jsx';
 import AutocompleteSelector from './components/mui-components/AutocompleteSelector.jsx'
+import useFetch from './useFetch.jsx'; // Adjust the path as necessary
 
 
 export default function App() {
 
-  const theme = createTheme(getDesignTokens('light')); //optional: add light and dark mode
+  const { data, loading, error } = useFetch('http://localhost:5000/api/data');
+  const [selectedCourses, setSelectedCourses] = React.useState([]);
 
-  const [selectedCourses, setSelectedCourses] = React.useState([])
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const theme = createTheme(getDesignTokens('light')); //optional: add light and dark mode
 
   const handleCourseSelect = (course) => {
     if (course && !selectedCourses.some(c => c.key === course.key)) {
@@ -56,7 +62,7 @@ export default function App() {
           mr: 16
         }}
       >
-        <CummulativeReport />
+        {!loading && <CummulativeReport key={1} data={data}/>}
       </Box>
       <Box
         sx={{
@@ -66,7 +72,7 @@ export default function App() {
           mr: 16
         }}
       >
-        <AutocompleteSelector onSelect={handleCourseSelect} selectedCourses={selectedCourses}/>
+        {!loading && <AutocompleteSelector onSelect={handleCourseSelect} selectedCourses={selectedCourses} data={data}/>}
         {selectedCourses !== null ? courseComponents : <></>}
       </Box>
       <Footer />

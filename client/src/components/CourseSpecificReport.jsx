@@ -34,7 +34,7 @@ export default function CourseSpecificReport( { course, courseUnselect } ) {
         mb: 8
       }}
     >
-      <Header title = {course.name}/>
+      <Header title = {course.fullname}/>
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
