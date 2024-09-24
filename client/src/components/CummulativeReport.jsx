@@ -105,7 +105,7 @@ export default function CummulativeReport( { data } ) {
 function getState(zipString) {
   /* Ensure param is a string to prevent unpredictable parsing results */
   if (typeof zipString !== 'string') {
-    console.error('Must pass the zipcode as a string.', zipString);
+    // console.error('Must pass the zipcode as a string.', zipString);
     return;
   }
 
@@ -117,7 +117,7 @@ function getState(zipString) {
 
   /* Ensure we have exactly 5 characters to parse */
   if (zipString.length !== 5) {
-    console.error('Must pass a 5-digit zipcode.', "-", zipString, "-");
+    // console.error('Must pass a 5-digit zipcode.', "-", zipString, "-");
     return "Unknown";
   }
 
@@ -288,7 +288,7 @@ function getState(zipString) {
   } else {
     st = 'Unknown';
     state = 'Unkown';
-    console.error('No state found matching', zipcode, zipString);
+    // console.error('No state found matching', zipcode, zipString);
   }
 
   /* Return `state` for full name or `st` for postal abbreviation */

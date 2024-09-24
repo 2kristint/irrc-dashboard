@@ -23,9 +23,7 @@ export default function CourseSpecificReport( { course, courseUnselect, data } )
   }, []);
 
   function getEnrollmentData(courseName, data){
-    console.log(data)
     const courseData = data.find(obj => obj.course_name === courseName);
-    console.log(courseData)
     return courseData;
   }
 
