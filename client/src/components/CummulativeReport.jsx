@@ -12,33 +12,17 @@ import {
 } from '@mui/material';
 import Header from './layout/Header.jsx'
 
-export default function DataTable() {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
+export default function CummulativeReport( { data } ) {
   const [statesList, setStatesList] = useState({});
 
-  useEffect(() => {
-    fetch('http://localhost:5000/api/data')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response error' + response.statusText);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setData(data);
-        getStatesList(data)
-      })
-      .catch(error => setError(error.message));
+  React.useEffect(() => {
+    getStatesList(data)
   }, []);
-
-
 
   //create user states list from array of zipCodes
   function getStatesList(data) {
     let statesList = [];
     (data.userZipcodes).forEach((ele) => {
-      console.log(ele)
       let state = getState(ele.data);
       if (statesList[state]) {
         statesList[state] += ele.user_count;
@@ -49,11 +33,6 @@ export default function DataTable() {
     })
     statesList.sort();
     setStatesList(statesList);
-    console.log(statesList);
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   return (
@@ -122,10 +101,11 @@ export default function DataTable() {
   );
 };
 
+//get state from zipcode
 function getState(zipString) {
   /* Ensure param is a string to prevent unpredictable parsing results */
   if (typeof zipString !== 'string') {
-    console.error('Must pass the zipcode as a string.', zipString);
+    // console.error('Must pass the zipcode as a string.', zipString);
     return;
   }
 
@@ -137,7 +117,7 @@ function getState(zipString) {
 
   /* Ensure we have exactly 5 characters to parse */
   if (zipString.length !== 5) {
-    console.error('Must pass a 5-digit zipcode.', "-", zipString, "-");
+    // console.error('Must pass a 5-digit zipcode.', "-", zipString, "-");
     return "Unknown";
   }
 
@@ -308,7 +288,7 @@ function getState(zipString) {
   } else {
     st = 'Unknown';
     state = 'Unkown';
-    console.error('No state found matching', zipcode, zipString);
+    // console.error('No state found matching', zipcode, zipString);
   }
 
   /* Return `state` for full name or `st` for postal abbreviation */
