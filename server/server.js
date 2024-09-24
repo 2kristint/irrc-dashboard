@@ -44,14 +44,14 @@ app.get('/api/data', async (req, res) => {
         });
 
         const query3 = new Promise((resolve, reject) => {
-            db.query('SELECT fullname FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
+            db.query('SELECT fullname,id FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
         const query4 = new Promise((resolve, reject) => {
-            db.query(`SELECT c.fullname AS course_name,
+            db.query(`SELECT c.fullname AS course_name, c.id,
                             COUNT(*) AS total_users,
                             COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) AS completed_users
                         FROM dbgyt2oi9llwgg.mdlxk_course_completions cc

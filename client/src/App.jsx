@@ -27,7 +27,7 @@ export default function App() {
   const theme = createTheme(getDesignTokens('light')); //optional: add light and dark mode
 
   const handleCourseSelect = (course) => {
-    if (course && !selectedCourses.some(c => c.key === course.key)) {
+    if (course && !selectedCourses.some(c => c.id === course.id)) {
       setSelectedCourses(prevState => [...prevState, course]);
     }
   }
@@ -40,7 +40,7 @@ export default function App() {
 
   //display courses
   const courseComponents = selectedCourses.map(course => (
-    <CourseSpecificReport key={course.key} course={course} courseUnselect={handleCourseUnselect}/>
+    <CourseSpecificReport key={course.id} course={course} courseUnselect={handleCourseUnselect} data={data}/>
   ));
   
   return (
