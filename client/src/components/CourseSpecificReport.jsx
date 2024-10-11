@@ -12,28 +12,26 @@ import {
 } from '@mui/material';
 import Header from './layout/Header.jsx'
 import axios from 'axios';
+import { useQuery } from 'react-query';
 
-export default function CourseSpecificReport({ course, courseUnselect, data }) {
+const retrieveData = async (id) => {
+  const response = await axios.get(`http://localhost:5000/get1?param=${id}`);
+  return response.data;
+};
 
-  const [courseData, setCourseData] = React.useState({});
-  const [DataList, setDataList] = React.useState({});
+export default function CourseSpecificReport({ course, courseUnselect, id }) {
 
-  React.useEffect(() => {
-    const courseData = getEnrollmentData(course.fullname, data.enrollmentData)
-    setCourseData(courseData)
-    axios.get('http://localhost:5000/get1?param=2')
-      .then((result) => {
-        console.log(result.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+  const {
+    data: resultData,
+    error,
+    isLoading
+  } = useQuery(["data", id], () => retrieveData(id))
 
-  function getEnrollmentData(courseName, data) {
-    const courseData = data.find(obj => obj.course_name === courseName);
-    return courseData;
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error fetching data</div>;
+
+  const enrollmentData = resultData?.enrollmentData[0] || {};
+  const feedback = resultData?.feedback || {};
 
   return (
     <>
@@ -46,7 +44,7 @@ export default function CourseSpecificReport({ course, courseUnselect, data }) {
         >
           <Header title={course.fullname} />
 
-          {courseData && DataList && <TableContainer component={Paper}>
+          {enrollmentData && <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -57,11 +55,11 @@ export default function CourseSpecificReport({ course, courseUnselect, data }) {
               </TableHead>
               <TableBody>
                 <TableRow
-                  key={courseData.id}
+                  key={enrollmentData.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row">{courseData.course_name}</TableCell>
-                  <TableCell align="right">{courseData.total_users}</TableCell>
-                  <TableCell align="right">{courseData.completed_users}</TableCell>
+                  <TableCell component="th" scope="row">{enrollmentData.course_name}</TableCell>
+                  <TableCell align="right">{enrollmentData.total_users}</TableCell>
+                  <TableCell align="right">{enrollmentData.completed_users}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

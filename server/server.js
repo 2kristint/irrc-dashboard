@@ -28,10 +28,13 @@ db.connect(err => {
     }
 });
 
+
+
+
 /* Grab data from multiple queries */
 app.get('/api/data', async (req, res) => {
     try {
-        const query1 = new Promise((resolve, reject) => {
+        const userTypeQuery = new Promise((resolve, reject) => {
             db.query('SELECT data, COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data WHERE fieldid = 3 GROUP BY data;',
                 (err, results) => {
                     if (err) reject(err);
@@ -39,43 +42,28 @@ app.get('/api/data', async (req, res) => {
                 });
         });
 
-        const query2 = new Promise((resolve, reject) => {
+        const userZipcodesQuery = new Promise((resolve, reject) => {
             db.query('SELECT data, COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data WHERE fieldid = 5 GROUP BY data;', (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
-        const query3 = new Promise((resolve, reject) => {
+        const courseNamesQuery = new Promise((resolve, reject) => {
             db.query('SELECT fullname, id FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
-        const query4 = new Promise((resolve, reject) => {
-            db.query(`SELECT c.fullname AS course_name, c.id,
-                            COUNT(*) AS total_users,
-                            COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) AS completed_users
-                        FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
-                        JOIN dbgyt2oi9llwgg.mdlxk_course c
-                            ON cc.course = c.id
-                        GROUP BY c.fullname;`, (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
-            });
-        });
-
-
         // Wait for all queries to complete
-        const [userTypes, userZipcodes, courseNames, enrollmentData] = await Promise.all([query1, query2, query3, query4]);
+        const [userTypes, userZipcodes, courseNames] = await Promise.all([userTypeQuery, userZipcodesQuery, courseNamesQuery]);
 
         // Send combined response as JSON
         res.json({
             userTypes,
             userZipcodes,
-            courseNames,
-            enrollmentData
+            courseNames
         });
 
     } catch (err) {
@@ -93,7 +81,21 @@ app.get('/get', (req, res) => {
 app.get('/get1', async (req, res) => {
     const param = req.query.param;
     try {
-        const query5 = new Promise((resolve, reject) => {
+
+        const enrollmentDataQuery = new Promise((resolve, reject) => {
+            db.query(`SELECT c.fullname AS course_name, c.id,
+                            COUNT(*) AS total_users,
+                            COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) AS completed_users
+                        FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
+                        JOIN dbgyt2oi9llwgg.mdlxk_course c
+                            ON cc.course = c.id
+                        WHERE c.id= ${param};`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        const feedbackQuery = new Promise((resolve, reject) => {
             db.query(`SELECT quizzes.name AS quiz, quizzes.course, quizzes.id, questions.name, questions.id, answers.value
             FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
             JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
@@ -109,11 +111,12 @@ app.get('/get1', async (req, res) => {
         });
 
         // Wait for all queries to complete
-        const [dataList] = await Promise.all([query5]);
+        const [enrollmentData, feedback] = await Promise.all([enrollmentDataQuery, feedbackQuery]);
 
         // Send combined response as JSON
         res.json({
-            dataList
+            enrollmentData,
+            feedback
         });
 
     } catch (err) {

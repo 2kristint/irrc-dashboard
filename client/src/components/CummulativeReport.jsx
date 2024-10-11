@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import Header from './layout/Header.jsx'
 
-export default function CummulativeReport( { data } ) {
+export default function CummulativeReport({ data }) {
   const [statesList, setStatesList] = useState({});
 
   React.useEffect(() => {
