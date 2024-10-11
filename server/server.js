@@ -1,11 +1,14 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json()); //converts to JSON
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 /* Connect to database */
 //env variables for security
@@ -44,7 +47,7 @@ app.get('/api/data', async (req, res) => {
         });
 
         const query3 = new Promise((resolve, reject) => {
-            db.query('SELECT fullname,id FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
+            db.query('SELECT fullname, id FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
@@ -73,6 +76,44 @@ app.get('/api/data', async (req, res) => {
             userZipcodes,
             courseNames,
             enrollmentData
+        });
+
+    } catch (err) {
+        console.error('Error executing queries:', err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/get', (req, res) => {
+    const param = req.query.param; // Access query parameter
+    console.log('Received request with param:', param); // Add this log
+    res.json({ message: `Received param: ${param}` });
+});
+
+app.get('/get1', async (req, res) => {
+    const param = req.query.param;
+    try {
+        const query5 = new Promise((resolve, reject) => {
+            db.query(`SELECT quizzes.name AS quiz, quizzes.course, quizzes.id, questions.name, questions.id, answers.value
+            FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+            JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+            ON quizzes.id = questions.feedback
+            Join dbgyt2oi9llwgg.mdlxk_feedback_value answers
+                ON questions.id = answers.item
+            WHERE quizzes.course = ${param};
+                `,
+                (err, results) => {
+                    if (err) reject(err);
+                    else resolve(results);
+                });
+        });
+
+        // Wait for all queries to complete
+        const [dataList] = await Promise.all([query5]);
+
+        // Send combined response as JSON
+        res.json({
+            dataList
         });
 
     } catch (err) {
