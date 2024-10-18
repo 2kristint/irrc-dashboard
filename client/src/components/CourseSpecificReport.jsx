@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useQuery } from 'react-query';
 
 const retrieveData = async (id) => {
-  const response = await axios.get(`http://localhost:5000/get1?param=${id}`);
+  const response = await axios.get(`http://localhost:5000/getCourseData?param=${id}`);
   return response.data;
 };
 
@@ -30,8 +30,10 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
 
-  const enrollmentData = resultData?.enrollmentData[0] || {};
-  const feedback = resultData?.feedback || {};
+  const enrollmentData = resultData?.enrollmentData[0];
+  const feedback = resultData?.feedback;
+
+  console.log(feedback)
 
   return (
     <>

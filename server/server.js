@@ -35,7 +35,11 @@ db.connect(err => {
 app.get('/api/data', async (req, res) => {
     try {
         const userTypeQuery = new Promise((resolve, reject) => {
-            db.query('SELECT data, COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data WHERE fieldid = 3 GROUP BY data;',
+            db.query(`SELECT data, COUNT(*) AS user_count 
+                FROM dbgyt2oi9llwgg.mdlxk_user_info_data 
+                WHERE fieldid = 3 
+                GROUP BY data
+                ORDER BY COUNT(*) DESC;`,
                 (err, results) => {
                     if (err) reject(err);
                     else resolve(results);
@@ -43,14 +47,19 @@ app.get('/api/data', async (req, res) => {
         });
 
         const userZipcodesQuery = new Promise((resolve, reject) => {
-            db.query('SELECT data, COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data WHERE fieldid = 5 GROUP BY data;', (err, results) => {
+            db.query(`SELECT data, 
+                COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data 
+                WHERE fieldid = 5 
+                GROUP BY data
+                ORDER BY COUNT(*) DESC;`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
         const courseNamesQuery = new Promise((resolve, reject) => {
-            db.query('SELECT fullname, id FROM dbgyt2oi9llwgg.mdlxk_course;', (err, results) => {
+            db.query(`SELECT fullname, 
+                id FROM dbgyt2oi9llwgg.mdlxk_course;`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
@@ -72,42 +81,42 @@ app.get('/api/data', async (req, res) => {
     }
 });
 
-app.get('/get', (req, res) => {
-    const param = req.query.param; // Access query parameter
-    console.log('Received request with param:', param); // Add this log
-    res.json({ message: `Received param: ${param}` });
-});
-
-app.get('/get1', async (req, res) => {
+app.get('/getCourseData', async (req, res) => {
     const param = req.query.param;
     try {
 
         const enrollmentDataQuery = new Promise((resolve, reject) => {
             db.query(`SELECT c.fullname AS course_name, c.id,
-                            COUNT(*) AS total_users,
-                            COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) AS completed_users
-                        FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
-                        JOIN dbgyt2oi9llwgg.mdlxk_course c
-                            ON cc.course = c.id
-                        WHERE c.id= ${param};`, (err, results) => {
+                        CASE WHEN COUNT(*) = 0 THEN NULL ELSE COUNT(*) END AS total_users,
+                        CASE WHEN COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) = 0 THEN NULL
+                                ELSE COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) END AS completed_users
+                    FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
+                    JOIN dbgyt2oi9llwgg.mdlxk_course c
+                    ON cc.course = c.id
+                    WHERE c.id = ${param}
+                    GROUP BY c.fullname, c.id;`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
         const feedbackQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT quizzes.name AS quiz, quizzes.course, quizzes.id, questions.name, questions.id, answers.value
-            FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-            JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-            ON quizzes.id = questions.feedback
-            Join dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                ON questions.id = answers.item
-            WHERE quizzes.course = ${param};
-                `,
-                (err, results) => {
-                    if (err) reject(err);
-                    else resolve(results);
-                });
+            db.query(`SELECT quizzes.name AS quiz,
+                        quizzes.course,
+                        quizzes.id AS quiz_id,
+                        questions.name AS question_name,
+                        questions.id AS question_id,
+                        JSON_ARRAYAGG(answers.value) AS answers
+                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions ON quizzes.id = questions.feedback
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers ON questions.id = answers.item
+                    WHERE quizzes.course = ${param}
+                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+                    GROUP BY questions.id, quizzes.id
+                    ORDER BY quizzes.id, questions.id;`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
         });
 
         // Wait for all queries to complete
