@@ -101,18 +101,23 @@ app.get('/getCourseData', async (req, res) => {
         });
 
         const feedbackQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT quizzes.name AS quiz,
+            db.query(`SELECT
+                        quizzes.name AS quiz,
                         quizzes.course,
                         quizzes.id AS quiz_id,
                         questions.name AS question_name,
                         questions.id AS question_id,
-                        JSON_ARRAYAGG(answers.value) AS answers
+                        answers.value AS answer,
+                        COUNT(answers.value) AS answerCount
                     FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers ON questions.id = answers.item
-                    WHERE quizzes.course = ${param}
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                        ON quizzes.id = questions.feedback
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+                        ON questions.id = answers.item
+                    WHERE quizzes.course =  ${param}
                         AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                    GROUP BY questions.id, quizzes.id
+                        AND questions.id = 27
+                    GROUP BY questions.id, quizzes.id, answers.value
                     ORDER BY quizzes.id, questions.id;`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
@@ -122,10 +127,17 @@ app.get('/getCourseData', async (req, res) => {
         // Wait for all queries to complete
         const [enrollmentData, feedback] = await Promise.all([enrollmentDataQuery, feedbackQuery]);
 
+        //format data
+        const feedbackData = feedback.map((ele, index) => ({
+            id: index,
+            value: ele.answerCount,
+            label: ele.answer
+        }));
+
         // Send combined response as JSON
         res.json({
             enrollmentData,
-            feedback
+            feedbackData
         });
 
     } catch (err) {

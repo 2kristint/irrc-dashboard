@@ -10,6 +10,7 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
+import { PieChart } from '@mui/x-charts';
 import Header from './layout/Header.jsx'
 import axios from 'axios';
 import { useQuery } from 'react-query';
@@ -31,9 +32,9 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   if (error) return <div>Error fetching data</div>;
 
   const enrollmentData = resultData?.enrollmentData[0];
-  const feedback = resultData?.feedback;
+  const feedbackData = resultData?.feedbackData;
 
-  console.log(feedback)
+  console.log(feedbackData)
 
   return (
     <>
@@ -67,6 +68,17 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
             </Table>
           </TableContainer>
           }
+
+          {feedbackData && <PieChart
+            series={[
+              {
+                data: feedbackData
+              },
+            ]}
+            width={400}
+            height={200}
+          />}
+
           <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>
         </Box>
       }
