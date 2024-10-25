@@ -28,9 +28,6 @@ db.connect(err => {
     }
 });
 
-
-
-
 /* Grab data from multiple queries */
 app.get('/api/data', async (req, res) => {
     try {
@@ -100,7 +97,26 @@ app.get('/getCourseData', async (req, res) => {
             });
         });
 
-        const feedbackQuery = new Promise((resolve, reject) => {
+        const userTypeChoicesQuery = new Promise((resolve, reject) => {
+            db.query(`SELECT
+                        quizzes.name AS quiz,
+                        quizzes.course,
+                        quizzes.id AS quiz_id,
+                        questions.name AS question_name,
+                        questions.id AS question_id,
+                        questions.presentation AS answer_choices
+                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                        ON quizzes.id = questions.feedback
+                    WHERE quizzes.course =  ${param}
+                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+                        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):');`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        const userTypeAnswersQuery = new Promise((resolve, reject) => {
             db.query(`SELECT
                         quizzes.name AS quiz,
                         quizzes.course,
@@ -116,7 +132,7 @@ app.get('/getCourseData', async (req, res) => {
                         ON questions.id = answers.item
                     WHERE quizzes.course =  ${param}
                         AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                        AND questions.id = 27
+                        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):')
                     GROUP BY questions.id, quizzes.id, answers.value
                     ORDER BY quizzes.id, questions.id;`, (err, results) => {
                 if (err) reject(err);
@@ -125,13 +141,17 @@ app.get('/getCourseData', async (req, res) => {
         });
 
         // Wait for all queries to complete
-        const [enrollmentData, feedback] = await Promise.all([enrollmentDataQuery, feedbackQuery]);
+        const [enrollmentData, userTypeChoices, userTypeAnswers] = await Promise.all([enrollmentDataQuery, userTypeChoicesQuery, userTypeAnswersQuery]);
 
         //format data
-        const feedbackData = feedback.map((ele, index) => ({
+
+        const answerChoicesString = userTypeChoices[0].answer_choices;
+        const choiceLabels = answerChoicesString.split('|'); // Splits into an array of labels          
+
+        const feedbackData = userTypeAnswers.map((ele, index) => ({
             id: index,
             value: ele.answerCount,
-            label: ele.answer
+            label: choiceLabels[ele.answer - 1] || `Choice ${ele.answer}`
         }));
 
         // Send combined response as JSON

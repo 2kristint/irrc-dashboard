@@ -42,7 +42,10 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
         <Box
           sx={{
             flexGrow: 1,
-            mb: 8
+            mb: 8,
+            display: 'flex', // Enable Flexbox
+            flexDirection: 'column', // Stack items vertically
+            alignItems: 'center', // Center items horizontally
           }}
         >
           <Header title={course.fullname} />
@@ -69,15 +72,32 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           </TableContainer>
           }
 
-          {feedbackData && <PieChart
-            series={[
-              {
-                data: feedbackData
-              },
-            ]}
-            width={400}
-            height={200}
-          />}
+          <Box>
+            {feedbackData &&
+              <PieChart
+                series={[
+                  {
+                    data: feedbackData,
+                  },
+                ]}
+                margin={{ top: 50, bottom: 50, left: 0, right: 1000 }}
+                slotProps={{
+                  legend: {
+                    direction: 'column',
+                    position: { vertical: 'middle', horizontal: 'middle' },
+                    padding: 0,
+                    labelStyle: {
+                      fontSize: 14
+                    },
+                    itemMarkWidth: 11,
+                    itemMarkHeight: 10,
+                  },
+                }}
+                width={1500}
+                height={300}
+              />
+            }
+          </Box>
 
           <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>
         </Box>
