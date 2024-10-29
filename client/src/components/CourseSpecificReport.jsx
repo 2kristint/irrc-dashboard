@@ -10,7 +10,7 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
-import { PieChart } from '@mui/x-charts';
+import { PieChart, BarChart } from '@mui/x-charts';
 import Header from './layout/Header.jsx'
 import axios from 'axios';
 import { useQuery } from 'react-query';
@@ -32,9 +32,11 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   if (error) return <div>Error fetching data</div>;
 
   const enrollmentData = resultData?.enrollmentData[0];
-  const feedbackData = resultData?.feedbackData;
+  const feedbackUserTypeData = resultData?.feedbackUserTypeData;
+  const gradeLevelLabels = resultData?.gradeLevelLabels;
+  const feedbackGradeLevelData = resultData?.feedbackGradeLevelData;
 
-  console.log(feedbackData)
+  console.log(feedbackGradeLevelData)
 
   return (
     <>
@@ -73,11 +75,11 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           }
 
           <Box>
-            {feedbackData &&
+            {feedbackUserTypeData &&
               <PieChart
                 series={[
                   {
-                    data: feedbackData,
+                    data: feedbackUserTypeData,
                   },
                 ]}
                 margin={{ top: 50, bottom: 50, left: 0, right: 1000 }}
@@ -97,6 +99,18 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                 height={300}
               />
             }
+          </Box>
+
+          <Box>
+            {feedbackGradeLevelData &&
+              <BarChart
+                width={1200}
+                height={300}
+                series={[
+                  { data: feedbackGradeLevelData, id: "gradeLevel" }
+                ]}
+                xAxis={[{ data: gradeLevelLabels, scaleType: 'band' }]}
+              />}
           </Box>
 
           <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>

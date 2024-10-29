@@ -140,24 +140,89 @@ app.get('/getCourseData', async (req, res) => {
             });
         });
 
+        const gradeLevelChoicesQuery = new Promise((resolve, reject) => {
+            db.query(`SELECT
+                        quizzes.name AS quiz,
+                        quizzes.course,
+                        quizzes.id AS quiz_id,
+                        questions.name AS question_name,
+                        questions.id AS question_id,
+                        questions.presentation AS answer_choices
+                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                        ON quizzes.id = questions.feedback
+                    WHERE quizzes.course =  ${param}
+                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+                        AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%');`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        const gradeLevelAnswersQuery = new Promise((resolve, reject) => {
+            db.query(`WITH RECURSIVE numbers AS (
+                        SELECT 1 AS num
+                        UNION ALL
+                        SELECT num + 1
+                        FROM numbers
+                        WHERE num < 10
+                    ),
+                    split_answers AS (
+                        SELECT
+                            quizzes.name AS quiz,
+                            quizzes.course,
+                            quizzes.id AS quiz_id,
+                            questions.name AS question_name,
+                            questions.id AS question_id,
+                            TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(answers.value, '|', numbers.num), '|', -1)) AS answer
+                        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                            ON quizzes.id = questions.feedback
+                        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+                            ON questions.id = answers.item
+                        JOIN numbers ON CHAR_LENGTH(answers.value)
+                            - CHAR_LENGTH(REPLACE(answers.value, '|', '')) >= numbers.num - 1
+                        WHERE quizzes.course = ${param}
+                            AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+                            AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%')
+                    )
+                    SELECT
+                        answer,
+                        COUNT(*) AS answerCount
+                    FROM split_answers
+                    WHERE answer <> ''
+                    GROUP BY answer
+                    ORDER BY answer;`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
         // Wait for all queries to complete
-        const [enrollmentData, userTypeChoices, userTypeAnswers] = await Promise.all([enrollmentDataQuery, userTypeChoicesQuery, userTypeAnswersQuery]);
+        const [enrollmentData, userTypeChoices, userTypeAnswers, gradeLevelChoices, gradeLevelAnswers] = await Promise.all([enrollmentDataQuery, userTypeChoicesQuery, userTypeAnswersQuery, gradeLevelChoicesQuery, gradeLevelAnswersQuery]);
 
         //format data
 
         const answerChoicesString = userTypeChoices[0].answer_choices;
         const choiceLabels = answerChoicesString.split('|'); // Splits into an array of labels          
 
-        const feedbackData = userTypeAnswers.map((ele, index) => ({
+        const feedbackUserTypeData = userTypeAnswers.map((ele, index) => ({
             id: index,
             value: ele.answerCount,
             label: choiceLabels[ele.answer - 1] || `Choice ${ele.answer}`
         }));
 
+        const gradeLevelChoicesString = gradeLevelChoices[0].answer_choices;
+        const gradeLevelLabels = gradeLevelChoicesString.split('|');
+
+        const feedbackGradeLevelData = gradeLevelAnswers.map(ele => ele.answerCount);
+
         // Send combined response as JSON
         res.json({
             enrollmentData,
-            feedbackData
+            feedbackUserTypeData,
+            gradeLevelLabels,
+            feedbackGradeLevelData
         });
 
     } catch (err) {
