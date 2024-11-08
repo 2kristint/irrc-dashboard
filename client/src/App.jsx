@@ -17,7 +17,7 @@ import { useQuery } from "react-query";
 
 const retrieveData = async () => {
   const response = await axios.get(
-    "http://localhost:5000/api/data",
+    "http://localhost:5000/api/cummulative-data/data",
   );
   return response.data;
 };

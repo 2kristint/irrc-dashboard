@@ -15,9 +15,10 @@ import { PieChart, BarChart } from '@mui/x-charts';
 import Header from './layout/Header.jsx'
 import axios from 'axios';
 import { useQuery } from 'react-query';
+import CSVButton from './mui-components/CSVDownloadButton.jsx'
 
 const retrieveData = async (id) => {
-  const response = await axios.get(`http://localhost:5000/getCourseData?param=${id}`);
+  const response = await axios.get(`http://localhost:5000/api/course-specific/getCourseData?param=${id}`);
   return response.data;
 };
 
@@ -41,6 +42,8 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   const Q3_EngagingAppropriate = resultData?.Q3_EngagingAppropriate;
   const Q4_Navigate = resultData?.Q4_Navigate;
   const Q5_Technology = resultData?.Q5_Technology;
+  const qualitativeFeedbackLikes = resultData?.qualitativeFeedbackLikes;
+  const qualitativeFeedbackImprovements = resultData?.qualitativeFeedbackImprovements;
 
   const feedbackSurveys = [
     {
@@ -175,6 +178,9 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
               />
             </Box>
           ))}
+
+          < CSVButton jsonData={qualitativeFeedbackLikes} />
+          < CSVButton jsonData={qualitativeFeedbackImprovements} />
 
           <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>
         </Box>

@@ -1,84 +1,8 @@
 const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const bodyParser = require('body-parser')
-require('dotenv').config();
+const router = express.Router();
+const db = require('../Config/DatabaseConfig');
 
-const app = express();
-app.use(cors());
-app.use(express.json()); //converts to JSON
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-/* Connect to database */
-//env variables for security
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    port: 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
-
-db.connect(err => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-    } else {
-        console.log('Connected to the database');
-    }
-});
-
-/* Grab data from multiple queries */
-app.get('/api/data', async (req, res) => {
-    try {
-        const userTypeQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT data, COUNT(*) AS user_count 
-                FROM dbgyt2oi9llwgg.mdlxk_user_info_data 
-                WHERE fieldid = 3 
-                GROUP BY data
-                ORDER BY COUNT(*) DESC;`,
-                (err, results) => {
-                    if (err) reject(err);
-                    else resolve(results);
-                });
-        });
-
-        const userZipcodesQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT data, 
-                COUNT(*) AS user_count FROM dbgyt2oi9llwgg.mdlxk_user_info_data 
-                WHERE fieldid = 5 
-                GROUP BY data
-                ORDER BY COUNT(*) DESC;`, (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
-            });
-        });
-
-        const courseNamesQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT fullname, 
-                id FROM dbgyt2oi9llwgg.mdlxk_course;`, (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
-            });
-        });
-
-        // Wait for all queries to complete
-        const [userTypes, userZipcodes, courseNames] = await Promise.all([userTypeQuery, userZipcodesQuery, courseNamesQuery]);
-
-        // Send combined response as JSON
-        res.json({
-            userTypes,
-            userZipcodes,
-            courseNames
-        });
-
-    } catch (err) {
-        console.error('Error executing queries:', err);
-        res.status(500).send('Server error');
-    }
-});
-
-app.get('/getCourseData', async (req, res) => {
+router.get('/getCourseData', async (req, res) => {
     const param = req.query.param;
     try {
 
@@ -416,6 +340,50 @@ app.get('/getCourseData', async (req, res) => {
             });
         });
 
+        const qualitativeFeedbackLikesQuery = new Promise((resolve, reject) => {
+            db.query(`SELECT
+                        quizzes.course,
+                        quizzes.id AS quiz_id,
+                        quizzes.name AS quiz,
+                        questions.id AS question_id,
+                        questions.name AS question_name,
+                        answers.value
+                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                        ON quizzes.id = questions.feedback
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+                        ON questions.id = answers.item
+                    WHERE quizzes.course = ${param}
+                        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
+                        AND LOWER(questions.name) LIKE LOWER('%What did you like most about this learning module?%')
+                        AND answers.value <> '';`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        const qualitativeFeedbackImprovementsQuery = new Promise((resolve, reject) => {
+            db.query(`SELECT
+                        quizzes.course,
+                        quizzes.id AS quiz_id,
+                        quizzes.name AS quiz,
+                        questions.id AS question_id,
+                        questions.name AS question_name,
+                        answers.value
+                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+                        ON quizzes.id = questions.feedback
+                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+                        ON questions.id = answers.item
+                    WHERE quizzes.course = ${param}
+                        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
+                        AND LOWER(questions.name) LIKE LOWER('%What aspects of the learning module could be improved?%')
+                        AND answers.value <> '';`, (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
         // Wait for all queries to complete
         const [
             enrollmentData,
@@ -432,7 +400,9 @@ app.get('/getCourseData', async (req, res) => {
             Q4_NavigateChoices,
             Q4_NavigateAnswers,
             Q5_TechnologyChoices,
-            Q5_TechnologyAnswers
+            Q5_TechnologyAnswers,
+            qualitativeFeedbackLikes,
+            qualitativeFeedbackImprovements
         ] = await Promise.all([
             enrollmentDataQuery,
             userTypeChoicesQuery,
@@ -448,7 +418,9 @@ app.get('/getCourseData', async (req, res) => {
             Q4_NavigateChoicesQuery,
             Q4_NavigateAnswersQuery,
             Q5_TechnologyChoicesQuery,
-            Q5_TechnologyAnswersQuery
+            Q5_TechnologyAnswersQuery,
+            qualitativeFeedbackLikesQuery,
+            qualitativeFeedbackImprovementsQuery
         ]);
 
         //** format data **//
@@ -522,7 +494,9 @@ app.get('/getCourseData', async (req, res) => {
             Q2_Applicable,
             Q3_EngagingAppropriate,
             Q4_Navigate,
-            Q5_Technology
+            Q5_Technology,
+            qualitativeFeedbackLikes,
+            qualitativeFeedbackImprovements
         });
 
     } catch (err) {
@@ -531,9 +505,4 @@ app.get('/getCourseData', async (req, res) => {
     }
 });
 
-
-/* Starting server */
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = router;
