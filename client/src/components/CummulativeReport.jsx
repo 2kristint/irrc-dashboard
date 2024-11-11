@@ -10,42 +10,17 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Header from './layout/Header.jsx'
 
 export default function CummulativeReport({ data }) {
 
-  console.log(data.statesList);
+  const [value, setValue] = React.useState(dayjs('2022-04-17'));
 
-  // const [statesList, setStatesList] = useState([]);
-
-  // useEffect(() => {
-  //   if (data && data.statesList) {
-  //     setStatesList(data.statesList);
-  //   }
-  // }, [data]);
-
-  // const [statesList, setStatesList] = useState({});
-
-  // React.useEffect(() => {
-  //   getStatesList(data)
-  // }, []);
-
-  // //create user states list from array of zipCodes
-  // function getStatesList(data) {
-  //   let statesList = [];
-  //   (data.userZipcodes).forEach((ele) => {
-  //     let state = getState(ele.data);
-  //     if (statesList[state]) {
-  //       statesList[state] += ele.user_count;
-  //     }
-  //     else {
-  //       statesList[state] = ele.user_count;
-  //     }
-  //   })
-  //   statesList.sort();
-  //   setStatesList(statesList);
-  // }
-
+  console.log(data.courseEnrollment);
 
   return (
     <div>
@@ -109,6 +84,19 @@ export default function CummulativeReport({ data }) {
         </TableContainer>
       </Box>
 
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker
+          label="From"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+        />
+        <DatePicker
+          label="To"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+        />
+      </LocalizationProvider>
+
       <Box
         sx={{
           flexGrow: 1,
@@ -121,8 +109,8 @@ export default function CummulativeReport({ data }) {
             <TableHead>
               <TableRow>
                 <TableCell>Course</TableCell>
-                <TableCell align="right">Total Users</TableCell>
                 <TableCell align="right">Completed Users</TableCell>
+                <TableCell align="right">Total Users</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -132,8 +120,8 @@ export default function CummulativeReport({ data }) {
                     key={course.id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell component="th" scope="row">{course.course_name}</TableCell>
-                    <TableCell align="right">{course.total_users}</TableCell>
-                    <TableCell align="right">{course.completed_users}</TableCell>
+                    <TableCell align="right">{course.total_complete}</TableCell>
+                    <TableCell align="right">{course.total_enrolled}</TableCell>
                   </TableRow>
                 )
               })}

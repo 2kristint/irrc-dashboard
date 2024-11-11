@@ -89,8 +89,8 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
               <TableHead>
                 <TableRow>
                   <TableCell>Course</TableCell>
-                  <TableCell align="right">Total Users</TableCell>
                   <TableCell align="right">Completed Users</TableCell>
+                  <TableCell align="right">Total Users</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -98,8 +98,8 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   key={enrollmentData.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">{enrollmentData.course_name}</TableCell>
-                  <TableCell align="right">{enrollmentData.total_users}</TableCell>
-                  <TableCell align="right">{enrollmentData.completed_users}</TableCell>
+                  <TableCell align="right">{enrollmentData.total_complete}</TableCell>
+                  <TableCell align="right">{enrollmentData.total_enrolled}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

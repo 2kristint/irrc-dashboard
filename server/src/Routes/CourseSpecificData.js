@@ -8,15 +8,14 @@ router.get('/getCourseData', async (req, res) => {
 
         //Number of users enrolled and completed query
         const enrollmentDataQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT c.fullname AS course_name, c.id,
-                        CASE WHEN COUNT(*) = 0 THEN NULL ELSE COUNT(*) END AS total_users,
-                        CASE WHEN COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) = 0 THEN NULL
-                                ELSE COUNT(CASE WHEN cc.timecompleted IS NOT NULL THEN 1 END) END AS completed_users
-                    FROM dbgyt2oi9llwgg.mdlxk_course_completions cc
-                    JOIN dbgyt2oi9llwgg.mdlxk_course c
-                    ON cc.course = c.id
-                    WHERE c.id = ${param}
-                    GROUP BY c.fullname, c.id;`, (err, results) => {
+            db.query(`SELECT c.fullname AS course_name,
+                        COUNT(cs.timecompleted) AS total_complete,
+                        COUNT(*) AS total_enrolled
+                        FROM dbgyt2oi9llwgg.mdlxk_course_completions AS cs
+                        JOIN dbgyt2oi9llwgg.mdlxk_course AS c ON cs.course=c.id
+                        LEFT JOIN dbgyt2oi9llwgg.mdlxk_user_info_data AS u ON cs.userid = u.userid
+                        WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'AND c.id = ${param}
+                        GROUP BY c.id`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });
