@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../Config/DatabaseConfig');
+const getStatesList = require('../HelperFunctions/getStatesList');
 
 router.get('/data', async (req, res) => {
     try {
@@ -52,10 +53,15 @@ router.get('/data', async (req, res) => {
         // Wait for all queries to complete
         const [userTypes, userZipcodes, courseNames, courseEnrollment] = await Promise.all([userTypeQuery, userZipcodesQuery, courseNamesQuery, courseEnrollmentQuery]);
 
+        statesList = getStatesList(userZipcodes);
+        console.log(`statesList is ${statesList}`);
+
+        console.log(`userTypes is ${userTypes}`)
+
         // Send combined response as JSON
         res.json({
             userTypes,
-            userZipcodes,
+            statesList,
             courseNames,
             courseEnrollment
         });

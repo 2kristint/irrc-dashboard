@@ -11,30 +11,41 @@ import {
   Paper
 } from '@mui/material';
 import Header from './layout/Header.jsx'
-import getState from './HelperFunctions/getState'
 
 export default function CummulativeReport({ data }) {
-  const [statesList, setStatesList] = useState({});
 
-  React.useEffect(() => {
-    getStatesList(data)
-  }, []);
+  console.log(data.statesList);
 
-  //create user states list from array of zipCodes
-  function getStatesList(data) {
-    let statesList = [];
-    (data.userZipcodes).forEach((ele) => {
-      let state = getState(ele.data);
-      if (statesList[state]) {
-        statesList[state] += ele.user_count;
-      }
-      else {
-        statesList[state] = ele.user_count;
-      }
-    })
-    statesList.sort();
-    setStatesList(statesList);
-  }
+  // const [statesList, setStatesList] = useState([]);
+
+  // useEffect(() => {
+  //   if (data && data.statesList) {
+  //     setStatesList(data.statesList);
+  //   }
+  // }, [data]);
+
+  // const [statesList, setStatesList] = useState({});
+
+  // React.useEffect(() => {
+  //   getStatesList(data)
+  // }, []);
+
+  // //create user states list from array of zipCodes
+  // function getStatesList(data) {
+  //   let statesList = [];
+  //   (data.userZipcodes).forEach((ele) => {
+  //     let state = getState(ele.data);
+  //     if (statesList[state]) {
+  //       statesList[state] += ele.user_count;
+  //     }
+  //     else {
+  //       statesList[state] = ele.user_count;
+  //     }
+  //   })
+  //   statesList.sort();
+  //   setStatesList(statesList);
+  // }
+
 
   return (
     <div>
@@ -87,7 +98,7 @@ export default function CummulativeReport({ data }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(statesList).map(([state, count]) => (
+              {data.statesList.map(({ state, count }) => (
                 <TableRow key={state} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">{state}</TableCell>
                   <TableCell align="right">{count}</TableCell>

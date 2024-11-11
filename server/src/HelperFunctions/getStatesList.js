@@ -1,5 +1,44 @@
-//get state from zipcode
-export default function getState(zipString) {
+
+// //create user states list from array of zipCodes
+// function getStatesList(zipcodes) {
+//     let statesList = [];
+//     (zipcodes).forEach((ele) => {
+//         let state = getState(ele.data);
+//         if (statesList[state]) {
+//             statesList[state] += ele.user_count;
+//         }
+//         else {
+//             statesList[state] = ele.user_count;
+//         }
+//     })
+//     // statesList.sort();
+//     // console.log(statesList);
+//     const sortedStatesList = Object.entries(statesList).sort((a, b) => b[1] - a[1]);
+//     return sortedStatesList;
+// }
+
+// Create user states list from array of zipCodes
+function getStatesList(zipcodes) {
+    let statesList = {};
+
+    zipcodes.forEach((ele) => {
+        let state = getState(ele.data);  // Assuming getState is a function that maps zip codes to states
+        if (statesList[state]) {
+            statesList[state] += ele.user_count;
+        } else {
+            statesList[state] = ele.user_count;
+        }
+    });
+
+    // Convert the statesList object into an array of objects and sort it by count in descending order
+    const sortedStatesList = Object.entries(statesList)
+        .map(([state, count]) => ({ state, count }))
+        .sort((a, b) => b.count - a.count);
+
+    return sortedStatesList;
+}
+
+function getState(zipString) {
     /* Ensure param is a string to prevent unpredictable parsing results */
     if (typeof zipString !== 'string') {
         // console.error('Must pass the zipcode as a string.', zipString);
@@ -191,3 +230,5 @@ export default function getState(zipString) {
     /* Return `state` for full name or `st` for postal abbreviation */
     return st;
 }
+
+module.exports = getStatesList;
