@@ -15,7 +15,14 @@ import AutocompleteSelector from './components/mui-components/AutocompleteSelect
 import axios from 'axios';
 import { useQuery } from "react-query";
 
-const retrieveData = async () => {
+const retrieveCummulativeData = async () => {
+  const response = await axios.get(
+    "http://localhost:5000/api/cummulative-data/data",
+  );
+  return response.data;
+};
+
+const retrieveEnrollmentData = async () => {
   const response = await axios.get(
     "http://localhost:5000/api/cummulative-data/data",
   );
@@ -24,11 +31,21 @@ const retrieveData = async () => {
 
 export default function App() {
 
-  const {
-    data: data,
-    error,
-    isLoading,
-  } = useQuery("data", retrieveData);
+  const { data: data, error, isLoading } = useQuery("data", retrieveCummulativeData, {
+    cacheTime: 10000,
+    staleTime: 30000,
+    refetchOnWindowFocus: true
+  });
+
+  const { data: enrollmentData, error: enrollmentError, isLoading: enrollmentIsLoading } = useQuery("data", retrieveEnrollmentData, {
+    cacheTime: 10000,
+    staleTime: 30000,
+    refetchOnWindowFocus: true
+  });
+
+  function callCourseEnrollmentQuery() {
+
+  }
 
   const [selectedCourses, setSelectedCourses] = React.useState([]);
 

@@ -18,7 +18,8 @@ import Header from './layout/Header.jsx'
 
 export default function CummulativeReport({ data }) {
 
-  const [value, setValue] = React.useState(dayjs('2022-04-17'));
+  const [from, setFrom] = React.useState(dayjs('2022-04-17'));
+  const [to, setTo] = React.useState(dayjs('2022-04-17'));
 
   console.log(data.courseEnrollment);
 
@@ -87,15 +88,17 @@ export default function CummulativeReport({ data }) {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           label="From"
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
+          value={from}
+          onChange={(newValue) => setFrom(newValue)}
         />
         <DatePicker
           label="To"
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
+          value={to}
+          onChange={(newValue) => setTo(newValue)}
         />
       </LocalizationProvider>
+
+      <Button variant="contained" onClick={callCourseEnrollmentQuery} sx={{ mt: 2, float: "right" }}>Submit</Button>
 
       <Box
         sx={{

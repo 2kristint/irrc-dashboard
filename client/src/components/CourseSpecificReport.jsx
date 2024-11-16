@@ -68,8 +68,6 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
     }
   ]
 
-  console.log(feedbackGradeLevelData)
-
   return (
     <>
       {course &&

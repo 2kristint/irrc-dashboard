@@ -483,6 +483,30 @@ router.get('/getCourseData', async (req, res) => {
             label: Q5_TechnologyLabels[ele.answer - 1] || `Choice ${ele.answer}`
         }));
 
+
+        const feedbackSurveys = [
+            {
+                label: "Overall, how satisfied or dissatisfied are you with this learning module?",
+                data: Q1_OverallFeedback
+            },
+            {
+                label: "How applicable was the content?",
+                data: Q2_Applicable
+            },
+            {
+                label: "The course material was engaging and appropriate for the topic.",
+                data: Q3_EngagingAppropriate
+            },
+            {
+                label: "How easy was it to navigate this learning module?",
+                data: Q4_Navigate
+            },
+            {
+                label: "How often did you encounter issues related to the learning module technology?",
+                data: Q5_Technology
+            }
+        ]
+
         // Send combined response as JSON
         res.json({
             enrollmentData,

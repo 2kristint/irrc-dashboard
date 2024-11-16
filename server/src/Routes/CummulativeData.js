@@ -55,10 +55,6 @@ router.get('/data', async (req, res) => {
         const [userTypes, userZipcodes, courseNames, courseEnrollment] = await Promise.all([userTypeQuery, userZipcodesQuery, courseNamesQuery, courseEnrollmentQuery]);
 
         statesList = getStatesList(userZipcodes);
-        console.log(`statesList is ${statesList}`);
-
-        console.log(`userTypes is ${userTypes}`)
-        console.log(`courseEnrollment is ${courseEnrollment}`)
 
         // Send combined response as JSON
         res.json({
