@@ -22,14 +22,15 @@ const retrieveCummulativeData = async () => {
   return response.data;
 };
 
-const retrieveEnrollmentData = async () => {
-  const response = await axios.get(
-    "http://localhost:5000/api/cummulative-data/data",
-  );
-  return response.data;
-};
+// const retrieveEnrollmentData = async (to, from) => {
+//   const response = await axios.get(`http://localhost:5000/api/enrollment-data/enrollmentdata?param=${to, from}`);
+//   return response.data;
+// };
 
 export default function App() {
+
+  // const [from, setFrom] = React.useState(dayjs('2023-01-01'));
+  // const [to, setTo] = React.useState(dayjs('2023-12-31'));
 
   const { data: data, error, isLoading } = useQuery("data", retrieveCummulativeData, {
     cacheTime: 10000,
@@ -37,15 +38,19 @@ export default function App() {
     refetchOnWindowFocus: true
   });
 
-  const { data: enrollmentData, error: enrollmentError, isLoading: enrollmentIsLoading } = useQuery("data", retrieveEnrollmentData, {
-    cacheTime: 10000,
-    staleTime: 30000,
-    refetchOnWindowFocus: true
-  });
+  //have two query calls, one for usertype and states and another for enrollment data
+  //have default value for the times
+  //create a method that can be passed into the prop to change the times from the inputs
+  //when the inputs change, call the query again and update data
+  // function callCourseEnrollmentQuery() {
+  //   const fromValue = fromRef.current?.value || null;
+  //   const toValue = toRef.current?.value || null;
 
-  function callCourseEnrollmentQuery() {
+  //   console.log("From:", fromValue);
+  //   console.log("To:", toValue);
 
-  }
+  //   const { data: enrollmentData, error: enrollmentError, isLoading: enrollmentIsLoading } = useQuery(["data", to, from], () => retrieveEnrollmentData(to, from));
+  // }
 
   const [selectedCourses, setSelectedCourses] = React.useState([]);
 
