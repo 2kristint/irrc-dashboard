@@ -513,11 +513,7 @@ router.get('/getCourseData', async (req, res) => {
             feedbackUserTypeData,
             gradeLevelLabels,
             feedbackGradeLevelData,
-            Q1_OverallFeedback,
-            Q2_Applicable,
-            Q3_EngagingAppropriate,
-            Q4_Navigate,
-            Q5_Technology,
+            feedbackSurveys,
             qualitativeFeedbackLikes,
             qualitativeFeedbackImprovements
         });

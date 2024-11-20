@@ -29,8 +29,14 @@ router.get('/data', async (req, res) => {
         });
 
         const courseNamesQuery = new Promise((resolve, reject) => {
-            db.query(`SELECT fullname, 
-                id FROM dbgyt2oi9llwgg.mdlxk_course;`, (err, results) => {
+            db.query(`SELECT DISTINCT 
+                        c.fullname AS fullname, 
+                        c.id AS id
+                    FROM dbgyt2oi9llwgg.mdlxk_course_completions AS cs
+                    JOIN dbgyt2oi9llwgg.mdlxk_course AS c ON cs.course = c.id
+                    LEFT JOIN dbgyt2oi9llwgg.mdlxk_user_info_data AS u ON cs.userid = u.userid
+                    WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'
+                    ORDER BY c.fullname;`, (err, results) => {
                 if (err) reject(err);
                 else resolve(results);
             });

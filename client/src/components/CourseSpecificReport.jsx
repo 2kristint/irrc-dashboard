@@ -37,36 +37,10 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   const feedbackUserTypeData = resultData?.feedbackUserTypeData;
   const gradeLevelLabels = resultData?.gradeLevelLabels;
   const feedbackGradeLevelData = resultData?.feedbackGradeLevelData;
-  const Q1_OverallFeedback = resultData?.Q1_OverallFeedback;
-  const Q2_Applicable = resultData?.Q2_Applicable;
-  const Q3_EngagingAppropriate = resultData?.Q3_EngagingAppropriate;
-  const Q4_Navigate = resultData?.Q4_Navigate;
-  const Q5_Technology = resultData?.Q5_Technology;
+  const feedbackSurveys = resultData?.feedbackSurveys;
   const qualitativeFeedbackLikes = resultData?.qualitativeFeedbackLikes;
   const qualitativeFeedbackImprovements = resultData?.qualitativeFeedbackImprovements;
 
-  const feedbackSurveys = [
-    {
-      label: "Overall, how satisfied or dissatisfied are you with this learning module?",
-      data: Q1_OverallFeedback
-    },
-    {
-      label: "How applicable was the content?",
-      data: Q2_Applicable
-    },
-    {
-      label: "The course material was engaging and appropriate for the topic.",
-      data: Q3_EngagingAppropriate
-    },
-    {
-      label: "How easy was it to navigate this learning module?",
-      data: Q4_Navigate
-    },
-    {
-      label: "How often did you encounter issues related to the learning module technology?",
-      data: Q5_Technology
-    }
-  ]
 
   return (
     <>
