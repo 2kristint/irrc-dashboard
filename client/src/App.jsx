@@ -14,6 +14,7 @@ import CourseSpecificReport from './components/CourseSpecificReport.jsx';
 import AutocompleteSelector from './components/mui-components/AutocompleteSelector.jsx'
 import axios from 'axios';
 import { useQuery } from "react-query";
+import dayjs from 'dayjs';
 
 const retrieveCummulativeData = async () => {
   const response = await axios.get(
@@ -22,15 +23,16 @@ const retrieveCummulativeData = async () => {
   return response.data;
 };
 
-// const retrieveEnrollmentData = async (to, from) => {
-//   const response = await axios.get(`http://localhost:5000/api/enrollment-data/enrollmentdata?param=${to, from}`);
-//   return response.data;
-// };
+const retrieveEnrollmentData = async (to, from) => {
+  const response = await axios.get(`http://localhost:5000/api/enrollment-data/enrollmentdata?to=${to}&from=${from}`);
+  return response.data;
+};
 
 export default function App() {
 
-  // const [from, setFrom] = React.useState(dayjs('2023-01-01'));
-  // const [to, setTo] = React.useState(dayjs('2023-12-31'));
+  const [from, setFrom] = React.useState('2023/01/01');
+  const [to, setTo] = React.useState('2023/12/31');
+  const [selectedCourses, setSelectedCourses] = React.useState([]);
 
   const { data: data, error, isLoading } = useQuery("data", retrieveCummulativeData, {
     cacheTime: 10000,
@@ -38,21 +40,25 @@ export default function App() {
     refetchOnWindowFocus: true
   });
 
-  //have two query calls, one for usertype and states and another for enrollment data
-  //have default value for the times
-  //create a method that can be passed into the prop to change the times from the inputs
-  //when the inputs change, call the query again and update data
-  // function callCourseEnrollmentQuery() {
-  //   const fromValue = fromRef.current?.value || null;
-  //   const toValue = toRef.current?.value || null;
+  const { data: enrollmentData, refetch } = useQuery(
+    ["data", from, to],
+    () => retrieveEnrollmentData(to, from),
+    { enabled: false } // Disable automatic fetching
+  );
 
-  //   console.log("From:", fromValue);
-  //   console.log("To:", toValue);
+  function callCourseEnrollmentQuery(newFrom, newTo) {
 
-  //   const { data: enrollmentData, error: enrollmentError, isLoading: enrollmentIsLoading } = useQuery(["data", to, from], () => retrieveEnrollmentData(to, from));
-  // }
+    const formattedFrom = dayjs(newFrom).format('YYYY/MM/DD');
+    const formattedTo = dayjs(newTo).format('YYYY/MM/DD');
 
-  const [selectedCourses, setSelectedCourses] = React.useState([]);
+    console.log("Formatted From:", formattedFrom);
+    console.log("Formatted To:", formattedTo);
+
+    setFrom(formattedFrom);
+    setTo(formattedTo);
+
+    refetch();
+  }
 
   if (isLoading) return <div>Fetching information...</div>;
   if (error) return <div>An error occurred: {error.message}</div>;
@@ -76,6 +82,8 @@ export default function App() {
     <CourseSpecificReport key={course.id} id={course.id} course={course} courseUnselect={handleCourseUnselect} data={data} />
   ));
 
+  console.log(enrollmentData)
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -95,7 +103,14 @@ export default function App() {
             mr: 16
           }}
         >
-          {!isLoading && <CummulativeReport key={1} data={data} />}
+          {!isLoading && <CummulativeReport
+            data={data}
+            callCourseEnrollmentQuery={() => callCourseEnrollmentQuery(from, to)}
+            enrollmentData={enrollmentData}
+            from={dayjs(from)}
+            to={dayjs(to)}
+            setFrom={setFrom}
+            setTo={setTo} />}
         </Box>
         <Box
           sx={{

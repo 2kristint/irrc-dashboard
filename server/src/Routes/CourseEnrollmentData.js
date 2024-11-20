@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../Config/DatabaseConfig');
 
 router.get('/enrollmentdata', async (req, res) => {
-    const { from, to } = req.query.param;
+    const { from, to } = req.query;
     try {
         const courseEnrollmentQuery = new Promise((resolve, reject) => {
             db.query(`SELECT c.fullname AS course_name,
@@ -17,18 +17,20 @@ router.get('/enrollmentdata', async (req, res) => {
                     WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'
                     GROUP BY c.id
                     ORDER BY c.fullname;`, (err, results) => {
+                console.log(results)
                 if (err) reject(err);
                 else resolve(results);
             });
         });
 
+
         // Wait for all queries to complete
-        const [courseEnrollment] = await Promise.all([courseEnrollmentQuery]);
+        const courseEnrollment = await courseEnrollmentQuery;
 
         // Send combined response as JSON
-        res.json({
+        res.json(
             courseEnrollment
-        });
+        );
 
     } catch (err) {
         console.error('Error executing queries:', err);

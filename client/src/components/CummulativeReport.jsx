@@ -16,12 +16,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Header from './layout/Header.jsx'
 
-export default function CummulativeReport({ data }) {
-
-  // const [from, setFrom] = React.useState(dayjs('2023-01-01'));
-  // const [to, setTo] = React.useState(dayjs('2023-12-31'));
-
-  // console.log(data.courseEnrollment);
+export default function CummulativeReport({ data, callCourseEnrollmentQuery, enrollmentData, from, to, setFrom, setTo }) {
 
   return (
     <div>
@@ -85,21 +80,19 @@ export default function CummulativeReport({ data }) {
         </TableContainer>
       </Box>
 
-      {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           label="From"
           value={from}
-          onChange={() => { }}
+          onChange={(newValue) => setFrom(newValue)}
         />
         <DatePicker
           label="To"
           value={to}
-          onChange={() => { }}
+          onChange={(newValue) => setTo(newValue)}
         />
+        <Button variant="contained" onClick={() => callCourseEnrollmentQuery(from, to)} sx={{ mt: 2, float: "right" }}>Submit</Button>
       </LocalizationProvider>
-
-      <Button variant="contained" onClick={callCourseEnrollmentQuery} sx={{ mt: 2, float: "right" }}>Submit</Button> */}
-
       <Box
         sx={{
           flexGrow: 1,
@@ -114,10 +107,12 @@ export default function CummulativeReport({ data }) {
                 <TableCell>Course</TableCell>
                 <TableCell align="right">Completed Users</TableCell>
                 <TableCell align="right">Total Users</TableCell>
+                <TableCell align="right">Recently Completed</TableCell>
+                <TableCell align="right">Recently Enrolled</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.courseEnrollment?.map(function (course) {
+              {enrollmentData?.map(function (course) {
                 return (
                   <TableRow
                     key={course.id}
@@ -125,6 +120,8 @@ export default function CummulativeReport({ data }) {
                     <TableCell component="th" scope="row">{course.course_name}</TableCell>
                     <TableCell align="right">{course.total_complete}</TableCell>
                     <TableCell align="right">{course.total_enrolled}</TableCell>
+                    <TableCell align="right">{course.recently_completed}</TableCell>
+                    <TableCell align="right">{course.recently_enrolled}</TableCell>
                   </TableRow>
                 )
               })}
