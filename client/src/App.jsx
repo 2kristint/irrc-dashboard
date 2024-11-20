@@ -40,19 +40,17 @@ export default function App() {
     refetchOnWindowFocus: true
   });
 
-  const { data: enrollmentData, refetch } = useQuery(
+  const { data: enrollmentData, isLoading: enrollmentLoading, refetch } = useQuery(
     ["data", from, to],
     () => retrieveEnrollmentData(to, from),
-    { enabled: false } // Disable automatic fetching
+    { enabled: true }
   );
+
 
   function callCourseEnrollmentQuery(newFrom, newTo) {
 
     const formattedFrom = dayjs(newFrom).format('YYYY/MM/DD');
     const formattedTo = dayjs(newTo).format('YYYY/MM/DD');
-
-    console.log("Formatted From:", formattedFrom);
-    console.log("Formatted To:", formattedTo);
 
     setFrom(formattedFrom);
     setTo(formattedTo);
@@ -110,7 +108,9 @@ export default function App() {
             from={dayjs(from)}
             to={dayjs(to)}
             setFrom={setFrom}
-            setTo={setTo} />}
+            setTo={setTo}
+            enrollmentLoading={enrollmentLoading} />}
+
         </Box>
         <Box
           sx={{

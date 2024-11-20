@@ -17,7 +17,6 @@ router.get('/enrollmentdata', async (req, res) => {
                     WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'
                     GROUP BY c.id
                     ORDER BY c.fullname;`, (err, results) => {
-                console.log(results)
                 if (err) reject(err);
                 else resolve(results);
             });
