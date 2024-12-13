@@ -34,7 +34,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
 
-  const enrollmentData = resultData?.enrollmentData[0];
+  const enrollmentData = resultData?.enrollmentCompletedData;
   const feedbackUserTypeData = resultData?.feedbackUserTypeData;
   const gradeLevelLabels = resultData?.gradeLevelLabels;
   const feedbackGradeLevelData = resultData?.feedbackGradeLevelData;
@@ -49,12 +49,16 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
         <Box
           sx={{
             flexGrow: 1,
+            mt: 6,
             mb: 8,
             display: 'flex', // Enable Flexbox
             flexDirection: 'column', // Stack items vertically
             alignItems: 'center', // Center items horizontally
           }}
         >
+          <Typography variant="h3" marginRight="auto">
+            {course.fullname}
+          </Typography>
           <Box
             sx={{
               display: 'flex',
@@ -71,68 +75,83 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
               mb: 1
             }}
           >
-            <Typography variant="h3" fontWeight={600}>
-              {course.fullname}
-            </Typography>
           </Box>
-          {enrollmentData && <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Course</TableCell>
-                  <TableCell align="right">Completed Users</TableCell>
-                  <TableCell align="right">Total Users</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow
-                  key={enrollmentData.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row">{enrollmentData.course_name}</TableCell>
-                  <TableCell align="right">{enrollmentData.total_complete}</TableCell>
-                  <TableCell align="right">{enrollmentData.total_enrolled}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          }
+
+          <Grid container spacing={2}>
+            <Grid item xs={4} key={0}>
+              <Box>
+                <Typography variant="h4" gutterBottom>
+                  Enrollment Data
+                </Typography>
+                <PieChart
+                  series={[{
+                    data: enrollmentData,
+                    cx: "25%",
+                    cy: "50%",
+                  }]}
+                  margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                  slotProps={{
+                    legend: {
+                      direction: 'column',
+                      position: { vertical: 'middle', horizontal: 'middle' },
+                      padding: 0,
+                      margin: 0,
+                      labelStyle: {
+                        fontSize: 11,
+                        width: '100px',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        height: 'auto'
+                      },
+                      itemMarkWidth: 10,
+                      itemMarkHeight: 10,
+                    },
+                  }}
+                  width={500}
+                  height={250}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={8} key={1}>
+              <Box>
+                <Typography variant="h4" gutterBottom>
+                  User Types
+                </Typography>
+                <PieChart
+                  series={[{
+                    data: feedbackUserTypeData,
+                    cx: "20%",
+                    cy: "50%",
+                  }]}
+                  margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                  slotProps={{
+                    legend: {
+                      direction: 'column',
+                      position: { vertical: 'middle', horizontal: 'middle' },
+                      padding: 0,
+                      margin: 0,
+                      labelStyle: {
+                        fontSize: 11,
+                      },
+                      itemMarkWidth: 10,
+                      itemMarkHeight: 10,
+                    },
+                  }}
+                  width={900}
+                  height={250}
+                />
+              </Box>
+            </Grid>
+          </Grid>
 
           <Box>
             <Typography variant="h4" gutterBottom>
-              User Types
-            </Typography>
-            <PieChart
-              series={[
-                {
-                  data: feedbackUserTypeData,
-                },
-              ]}
-              margin={{ top: 50, bottom: 50, left: 0, right: 1000 }}
-              slotProps={{
-                legend: {
-                  direction: 'column',
-                  position: { vertical: 'middle', horizontal: 'middle' },
-                  padding: 0,
-                  labelStyle: {
-                    fontSize: 14
-                  },
-                  itemMarkWidth: 11,
-                  itemMarkHeight: 10,
-                },
-              }}
-              width={1200}
-              height={300}
-            />
-          </Box>
-
-          <Box>
-            <Typography variant="h3" gutterBottom>
               Grade Levels Worked With
             </Typography>
             {feedbackGradeLevelData &&
               <BarChart
                 width={1200}
-                height={300}
+                height={250}
                 series={[
                   { data: feedbackGradeLevelData, id: "gradeLevel" }
                 ]}
@@ -140,6 +159,10 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
               />}
           </Box>
 
+
+          <Typography variant="h4" gutterBottom marginRight="auto">
+            Feedback Surveys
+          </Typography>
           {/*Surveys*/}
           <Grid container spacing={2}>
             {feedbackSurveys.map((survey, index) => (
@@ -154,12 +177,16 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                     {survey.label}
                   </Typography>
                   <PieChart
-                    series={[{ data: survey.data }]}
+                    series={[{
+                      data: survey.data,
+                      cx: "15%",
+                      cy: "50%",
+                    }]}
                     margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
                     slotProps={{
                       legend: {
                         direction: 'column',
-                        position: { vertical: 'middle', horizontal: 'left' },
+                        position: { vertical: 'middle', horizontal: 'middle' },
                         padding: 0,
                         margin: 0,
                         labelStyle: {
@@ -181,15 +208,25 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
             ))}
             <Grid item xs={4}> {/* Same size as pie charts */}
               <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
-                <CSVButton jsonData={qualitativeFeedbackLikes} />
-                <CSVButton jsonData={qualitativeFeedbackImprovements} />
+                <Box
+                  sx={{
+                    margin: 2
+                  }}>
+                  <CSVButton jsonData={qualitativeFeedbackLikes} />
+                </Box>
+                <Box
+                  sx={{
+                    margin: 2
+                  }}>
+                  <CSVButton jsonData={qualitativeFeedbackImprovements} />
+                </Box>
               </Box>
             </Grid>
           </Grid>
           {/* < CSVButton jsonData={qualitativeFeedbackLikes} />
           < CSVButton jsonData={qualitativeFeedbackImprovements} /> */}
 
-          <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>
+          <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, marginLeft: "auto" }}>Close Data</Button>
         </Box>
       }
     </>

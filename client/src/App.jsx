@@ -97,9 +97,9 @@ export default function App() {
         <Box
           sx={{
             mt: 16,
-            mb: 4,
-            ml: 16,
-            mr: 16
+            mb: 0,
+            ml: "auto",
+            mr: "auto"
           }}
         >
           <Typography variant="h1" fontWeight={600}>
@@ -108,7 +108,7 @@ export default function App() {
         </Box>
         <Box
           sx={{
-            mt: 16,
+            mt: 4,
             mb: 4,
             ml: 16,
             mr: 16
@@ -149,7 +149,7 @@ export default function App() {
               mb: 1
             }}
           >
-            <Typography variant="h2" fontWeight={600}>
+            <Typography variant="h2">
               Course Data
             </Typography>
           </Box>

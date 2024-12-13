@@ -8,7 +8,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  Typography
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -27,7 +28,9 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
           mb: 8
         }}
       >
-        <Header title={"User Type"} />
+        <Typography variant="h4">
+          User Demographic
+        </Typography>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
@@ -61,7 +64,9 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
           mb: 8
         }}
       >
-        <Header title={"States"} />
+        <Typography variant="h4">
+          States
+        </Typography>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
@@ -84,62 +89,83 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
         </Paper>
       </Box>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          label="From"
-          value={from}
-          onChange={(newValue) => setFrom(newValue)}
-        />
-        <DatePicker
-          label="To"
-          value={to}
-          onChange={(newValue) => setTo(newValue)}
-        />
-        <Button variant="contained" onClick={() => callCourseEnrollmentQuery(from, to)} sx={{ mt: 2, float: "right" }}>Submit</Button>
-      </LocalizationProvider>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end'
+        }}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box
+            sx={{
+              margin: 2
+            }}>
+            <DatePicker
+              label="From"
+              value={from}
+              onChange={(newValue) => setFrom(newValue)}
+            />
+          </Box>
+          <Box
+            sx={{
+              margin: 2
+            }}>
+            <DatePicker
+              label="To"
+              value={to}
+              onChange={(newValue) => setTo(newValue)}
+            />
+          </Box>
+          <Button variant="contained" onClick={() => callCourseEnrollmentQuery(from, to)} sx={{ m: 2, float: "right" }}>Submit</Button>
+        </LocalizationProvider>
+      </Box>
 
-      {enrollmentLoading ? (
-        <div>Data loading..</div>
-      ) : (
-        <Box
-          sx={{
-            flexGrow: 1,
-            mb: 8
-          }}
-        >
-          <Header title={"Course Enrollment"} />
-          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
-              <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Course</TableCell>
-                    <TableCell align="right">Completed Users</TableCell>
-                    <TableCell align="right">Total Users</TableCell>
-                    <TableCell align="right">Recently Completed</TableCell>
-                    <TableCell align="right">Recently Enrolled</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {enrollmentData?.map(function (course) {
-                    return (
-                      <TableRow
-                        key={course.id}
-                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <TableCell component="th" scope="row">{course.course_name}</TableCell>
-                        <TableCell align="right">{course.total_complete}</TableCell>
-                        <TableCell align="right">{course.total_enrolled}</TableCell>
-                        <TableCell align="right">{course.recently_completed}</TableCell>
-                        <TableCell align="right">{course.recently_enrolled}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Box>
-      )}
-    </div>
+      {
+        enrollmentLoading ? (
+          <div>Data loading..</div>
+        ) : (
+          <Box
+            sx={{
+              flexGrow: 1,
+              mb: 8
+            }}
+          >
+            <Typography variant="h4">
+              Course Enrollment
+            </Typography>
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+              <TableContainer sx={{ maxHeight: 440 }}>
+                <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Course</TableCell>
+                      <TableCell align="right">Completed Users</TableCell>
+                      <TableCell align="right">Total Users</TableCell>
+                      <TableCell align="right">Recently Completed</TableCell>
+                      <TableCell align="right">Recently Enrolled</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {enrollmentData?.map(function (course) {
+                      return (
+                        <TableRow
+                          key={course.id}
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                          <TableCell component="th" scope="row">{course.course_name}</TableCell>
+                          <TableCell align="right">{course.total_complete}</TableCell>
+                          <TableCell align="right">{course.total_enrolled}</TableCell>
+                          <TableCell align="right">{course.recently_completed}</TableCell>
+                          <TableCell align="right">{course.recently_enrolled}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Box>
+        )
+      }
+    </div >
   );
 };

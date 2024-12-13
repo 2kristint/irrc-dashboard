@@ -341,17 +341,20 @@ router.get('/getCourseData', async (req, res) => {
 
         const qualitativeFeedbackLikesQuery = new Promise((resolve, reject) => {
             db.query(`SELECT
+                        course.fullname,
                         quizzes.course,
-                        quizzes.id AS quiz_id,
                         quizzes.name AS quiz,
-                        questions.id AS question_id,
+                        quizzes.id AS quiz_id,
                         questions.name AS question_name,
+                        questions.id AS question_id,
                         answers.value
                     FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
                     JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
                         ON quizzes.id = questions.feedback
                     JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
                         ON questions.id = answers.item
+                    JOIN dbgyt2oi9llwgg.mdlxk_course course
+	                    ON quizzes.course = course.id
                     WHERE quizzes.course = ${param}
                         AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
                         AND LOWER(questions.name) LIKE LOWER('%What did you like most about this learning module?%')
@@ -363,17 +366,20 @@ router.get('/getCourseData', async (req, res) => {
 
         const qualitativeFeedbackImprovementsQuery = new Promise((resolve, reject) => {
             db.query(`SELECT
+                        course.fullname,
                         quizzes.course,
-                        quizzes.id AS quiz_id,
                         quizzes.name AS quiz,
-                        questions.id AS question_id,
+                        quizzes.id AS quiz_id,
                         questions.name AS question_name,
+                        questions.id AS question_id,
                         answers.value
                     FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
                     JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
                         ON quizzes.id = questions.feedback
                     JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
                         ON questions.id = answers.item
+                    JOIN dbgyt2oi9llwgg.mdlxk_course course
+	                    ON quizzes.course = course.id
                     WHERE quizzes.course = ${param}
                         AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
                         AND LOWER(questions.name) LIKE LOWER('%What aspects of the learning module could be improved?%')
@@ -424,6 +430,18 @@ router.get('/getCourseData', async (req, res) => {
 
         //** format data **//
 
+        //enrollment data pie chart
+        const enrollmentCompletedData = [
+            {
+                id: 0,
+                value: enrollmentData[0].total_complete,
+                label: "Total Completed"
+            },
+            {
+                id: 1,
+                value: enrollmentData[0].total_enrolled,
+                label: "Total Enrolled"
+            }]
         //user type pie chart
         const answerChoicesString = userTypeChoices[0].answer_choices;
         const choiceLabels = answerChoicesString.split('|'); // Splits into an array of labels          
@@ -509,7 +527,7 @@ router.get('/getCourseData', async (req, res) => {
 
         // Send combined response as JSON
         res.json({
-            enrollmentData,
+            enrollmentCompletedData,
             feedbackUserTypeData,
             gradeLevelLabels,
             feedbackGradeLevelData,

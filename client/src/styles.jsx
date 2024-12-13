@@ -61,11 +61,55 @@ export const getDesignTokens = (mode) => {
       subtitle1: {
         fontSize: 12,
       },
-      body1: {
-        fontWeight: 500,
-      },
       button: {
         fontStyle: 'normal',
+      },
+      h1: {
+        fontFamily: [
+          'Zilla Slab',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+        ].join(','),
+      },
+      h2: {
+        fontFamily: [
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+        ].join(','),
+        fontWeight: 600
+      },
+      h3: {
+        fontFamily: [
+          'Zilla Slab',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+        ].join(','),
+      },
+      h4: {
+        fontFamily: [
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+        ].join(','),
       },
     },
   };
