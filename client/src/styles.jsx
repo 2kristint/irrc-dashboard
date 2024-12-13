@@ -35,27 +35,38 @@ export const getDesignTokens = (mode) => {
       mode,
       ...(mode === "light"
         ? {
-            primary: {
-              main: "#000000",
-            },
-            secondary: {
-              main: "#FFCD00",
-            },
-          }
+          primary: {
+            main: "#000000",
+          },
+          secondary: {
+            main: "#FFCD00",
+          },
+        }
         : {
-            primary: {
-              main: "#fbbf24",
-            },
-            secondary: {
-              main: "#9900ff",
-            },
-            background: {
-              default: "#303030",
-              paper: "#303030",
-              dialog: "#303030",
-            },
-            contrastText: "#000",
-          }),
+          primary: {
+            main: "#fbbf24",
+          },
+          secondary: {
+            main: "#9900ff",
+          },
+          background: {
+            default: "#303030",
+            paper: "#303030",
+            dialog: "#303030",
+          },
+          contrastText: "#000",
+        }),
+    },
+    typography: {
+      subtitle1: {
+        fontSize: 12,
+      },
+      body1: {
+        fontWeight: 500,
+      },
+      button: {
+        fontStyle: 'normal',
+      },
     },
   };
 };

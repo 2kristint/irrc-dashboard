@@ -28,29 +28,31 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
         }}
       >
         <Header title={"User Type"} />
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>User Type</TableCell>
-                <TableCell align="right">Number</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.userTypes?.map(function (type) {
-                return (
-                  <TableRow
-                    key={type.data}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">{type.data}</TableCell>
-                    <TableCell align="right">{type.user_count}</TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>User Type</TableCell>
+                  <TableCell align="right">Number</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.userTypes?.map(function (type) {
+                  return (
+                    <TableRow
+                      key={type.data}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">{type.data}</TableCell>
+                      <TableCell align="right">{type.user_count}</TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       </Box>
 
       <Box
@@ -60,24 +62,26 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
         }}
       >
         <Header title={"States"} />
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>States</TableCell>
-                <TableCell align="right">Number</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.statesList.map(({ state, count }) => (
-                <TableRow key={state} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row">{state}</TableCell>
-                  <TableCell align="right">{count}</TableCell>
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>States</TableCell>
+                  <TableCell align="right">Number</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {data.statesList.map(({ state, count }) => (
+                  <TableRow key={state} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell component="th" scope="row">{state}</TableCell>
+                    <TableCell align="right">{count}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       </Box>
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -104,34 +108,36 @@ export default function CummulativeReport({ data, callCourseEnrollmentQuery, enr
           }}
         >
           <Header title={"Course Enrollment"} />
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Course</TableCell>
-                  <TableCell align="right">Completed Users</TableCell>
-                  <TableCell align="right">Total Users</TableCell>
-                  <TableCell align="right">Recently Completed</TableCell>
-                  <TableCell align="right">Recently Enrolled</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {enrollmentData?.map(function (course) {
-                  return (
-                    <TableRow
-                      key={course.id}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell component="th" scope="row">{course.course_name}</TableCell>
-                      <TableCell align="right">{course.total_complete}</TableCell>
-                      <TableCell align="right">{course.total_enrolled}</TableCell>
-                      <TableCell align="right">{course.recently_completed}</TableCell>
-                      <TableCell align="right">{course.recently_enrolled}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Course</TableCell>
+                    <TableCell align="right">Completed Users</TableCell>
+                    <TableCell align="right">Total Users</TableCell>
+                    <TableCell align="right">Recently Completed</TableCell>
+                    <TableCell align="right">Recently Enrolled</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {enrollmentData?.map(function (course) {
+                    return (
+                      <TableRow
+                        key={course.id}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell component="th" scope="row">{course.course_name}</TableCell>
+                        <TableCell align="right">{course.total_complete}</TableCell>
+                        <TableCell align="right">{course.total_enrolled}</TableCell>
+                        <TableCell align="right">{course.recently_completed}</TableCell>
+                        <TableCell align="right">{course.recently_enrolled}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
         </Box>
       )}
     </div>

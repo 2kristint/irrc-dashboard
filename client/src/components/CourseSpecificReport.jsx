@@ -9,7 +9,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography
+  Typography,
+  Grid
 } from '@mui/material';
 import { PieChart, BarChart } from '@mui/x-charts';
 import Header from './layout/Header.jsx'
@@ -54,8 +55,26 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
             alignItems: 'center', // Center items horizontally
           }}
         >
-          <Header title={course.fullname} />
-
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: {
+                xs: 'column',
+                md: 'row',
+              },
+              alignItems: 'center',
+              justifyContent: {
+                xs: 'flex-start',
+                md: 'space-between',
+              },
+              mt: 2,
+              mb: 1
+            }}
+          >
+            <Typography variant="h3" fontWeight={600}>
+              {course.fullname}
+            </Typography>
+          </Box>
           {enrollmentData && <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
@@ -79,7 +98,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           }
 
           <Box>
-            <Typography variant="h3" gutterBottom>
+            <Typography variant="h4" gutterBottom>
               User Types
             </Typography>
             <PieChart
@@ -121,38 +140,54 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
               />}
           </Box>
 
-          {feedbackSurveys.map((survey, index) => (
-            <Box key={index}>
-              <Typography variant="h3" gutterBottom>
-                {survey.label}
-              </Typography>
-              <PieChart
-                series={[
-                  {
-                    data: survey.data,
-                  },
-                ]}
-                margin={{ top: 50, bottom: 50, left: 0, right: 1000 }}
-                slotProps={{
-                  legend: {
-                    direction: 'column',
-                    position: { vertical: 'middle', horizontal: 'middle' },
-                    padding: 0,
-                    labelStyle: {
-                      fontSize: 14
-                    },
-                    itemMarkWidth: 11,
-                    itemMarkHeight: 10,
-                  },
-                }}
-                width={1200}
-                height={300}
-              />
-            </Box>
-          ))}
-
-          < CSVButton jsonData={qualitativeFeedbackLikes} />
-          < CSVButton jsonData={qualitativeFeedbackImprovements} />
+          {/*Surveys*/}
+          <Grid container spacing={2}>
+            {feedbackSurveys.map((survey, index) => (
+              <Grid item xs={4} key={index}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'left'
+                  }}>
+                  <Typography variant="subtitle">
+                    {survey.label}
+                  </Typography>
+                  <PieChart
+                    series={[{ data: survey.data }]}
+                    margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                    slotProps={{
+                      legend: {
+                        direction: 'column',
+                        position: { vertical: 'middle', horizontal: 'left' },
+                        padding: 0,
+                        margin: 0,
+                        labelStyle: {
+                          fontSize: 11,
+                          width: '100px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          height: 'auto'
+                        },
+                        itemMarkWidth: 10,
+                        itemMarkHeight: 10,
+                      },
+                    }}
+                    width={500}
+                    height={200}
+                  />
+                </Box>
+              </Grid>
+            ))}
+            <Grid item xs={4}> {/* Same size as pie charts */}
+              <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
+                <CSVButton jsonData={qualitativeFeedbackLikes} />
+                <CSVButton jsonData={qualitativeFeedbackImprovements} />
+              </Box>
+            </Grid>
+          </Grid>
+          {/* < CSVButton jsonData={qualitativeFeedbackLikes} />
+          < CSVButton jsonData={qualitativeFeedbackImprovements} /> */}
 
           <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, float: "right" }}>Close Data</Button>
         </Box>

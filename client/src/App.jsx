@@ -4,7 +4,8 @@ import {
   Button,
   createTheme,
   ThemeProvider,
-  CssBaseline
+  CssBaseline,
+  Typography
 } from "@mui/material";
 import { getDesignTokens } from "./styles";
 import CummulativeReport from './components/CummulativeReport.jsx'
@@ -101,6 +102,18 @@ export default function App() {
             mr: 16
           }}
         >
+          <Typography variant="h1" fontWeight={600}>
+            IRRC Dashboard
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            mt: 16,
+            mb: 4,
+            ml: 16,
+            mr: 16
+          }}
+        >
           {!isLoading && <CummulativeReport
             data={data}
             callCourseEnrollmentQuery={() => callCourseEnrollmentQuery(from, to)}
@@ -110,8 +123,8 @@ export default function App() {
             setFrom={setFrom}
             setTo={setTo}
             enrollmentLoading={enrollmentLoading} />}
-
         </Box>
+
         <Box
           sx={{
             mt: 0,
@@ -120,6 +133,26 @@ export default function App() {
             mr: 16
           }}
         >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: {
+                xs: 'column',
+                md: 'row',
+              },
+              alignItems: 'center',
+              justifyContent: {
+                xs: 'flex-start',
+                md: 'space-between',
+              },
+              mt: 2,
+              mb: 1
+            }}
+          >
+            <Typography variant="h2" fontWeight={600}>
+              Course Data
+            </Typography>
+          </Box>
           {!isLoading && <AutocompleteSelector onSelect={handleCourseSelect} selectedCourses={selectedCourses} data={data} />}
           {selectedCourses !== null ? courseComponents : <></>}
         </Box>
