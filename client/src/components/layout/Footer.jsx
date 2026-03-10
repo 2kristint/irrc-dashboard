@@ -9,7 +9,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
 
 import logo from "~/assets/irrc-reverse.svg";
 
@@ -24,62 +23,87 @@ const links = [
 const today = new Date();
 const year = today.getFullYear();
 
+//font sizes
+const normal_text = 24;
+
 export default function Footer() {
   return (
-    <Paper
-      elevation={0}
-      component="footer"
-      sx={{ position: "sticky", top: "100vh" }}
-    >
-      <Divider sx={{ p: 0.5, backgroundColor: "secondary.main" }} />
+    <Paper elevation={0} component="footer" sx={{ position: "relative" }}>
+      <Divider sx={{ p: 1, backgroundColor: "primary.main" }} />
       <Box
         sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: "primary.main",
-          p: 1,
+          bgcolor: "#000000",
+          p: 2,
         }}
       >
-        <Container maxWidth="lg">
-          <Grid spacing={{ xs: 1, sm: 2 }} container justifyContent="center">
-            {/* logo */}
+        <Container
+          maxWidth={false}
+          sx={{
+            ml: 0,
+            pl: { xs: 2, md: 4, xl: 8 },
+            pb: 2,
+          }}
+        >
+          <Grid
+            container
+            spacing={8}
+            sx={{
+              display: "flex",
+              justifyContent: "flex-start",
+              flexWrap: "wrap",
+            }}
+          >
             <Grid item xs={12} md={6}>
-              <img src={logo} alt="IRRC Logo" width={250} />
-              <Stack spacing={1} sx={{ mt: 2 }}>
+              <Box className="logo--footer" sx={{ width: 400 }}>
+                <img src={logo} alt="IRRC Logo" width={"100%"} />
+              </Box>
+              <Stack spacing={2} sx={{ mt: 2 }}>
                 <Box>
-                  <Typography variant="button" sx={{ color: "white" }}>
-                    Iowa Reading Research Center
+                  <Typography
+                    className="company--name"
+                    variant="h4"
+                    sx={{
+                      color: "#fff",
+                    }}
+                  >
+                    IOWA READING RESEARCH CENTER
                   </Typography>
-                  <Typography sx={{ color: "#ccc" }}>
+                  <Typography
+                    className="company--address"
+                    variant="h4"
+                    sx={{ color: "#ccc" }}
+                  >
                     300{" "}
                     <Link
-                      target="_blank"
+                      variant="h4"
                       href="https://www.facilities.uiowa.edu/building/0454"
-                      sx={{ color: "secondary.main" }}
+                      sx={{ color: "primary.main" }}
                     >
                       Blank Honors Center
                     </Link>
                   </Typography>
-                  <Typography sx={{ color: "#ccc" }}>
+                  <Typography
+                    variant="h4"
+                    className="company--address"
+                    sx={{ color: "#ccc" }}
+                  >
                     Iowa City, IA 52245
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "white" }} variant="caption">
+                  <Typography
+                    className="copyright"
+                    sx={{ color: "#fff", fontSize: 20 }}
+                  >
                     © {year} Iowa Reading Research Center
                   </Typography>
                 </Box>
               </Stack>
             </Grid>
-            {/* logo */}
 
-            {/* links */}
             <Grid item xs={12} md={6}>
               <Box>
-                <Typography
-                  variant="h6"
-                  fontWeight={500}
-                  sx={{ color: grey[300], mb: 2 }}
-                >
+                <Typography variant="h4" sx={{ color: "#fff", pb: 1 }}>
                   Quick Links
                 </Typography>
                 {links.map((item) => (
@@ -87,11 +111,13 @@ export default function Footer() {
                     key={item.link}
                     sx={{ display: "flex", gap: 1, alignItems: "center" }}
                   >
-                    <LinkIcon sx={{ color: "white", fontSize: 16 }} />
+                    <LinkIcon variant="links" sx={{ color: "white" }} />
                     <Link
-                      target="_blank"
                       href={item.link}
-                      sx={{ color: "secondary.main" }}
+                      variant="links"
+                      sx={{
+                        color: "primary.main",
+                      }}
                     >
                       {item.name}
                     </Link>
@@ -99,7 +125,7 @@ export default function Footer() {
                 ))}
                 <Divider
                   orientation="vertical"
-                  sx={{ backgroundColor: grey[300] }}
+                  sx={{ backgroundColor: "#ffffff" }}
                 />
               </Box>
             </Grid>

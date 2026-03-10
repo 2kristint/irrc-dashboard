@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Button,
   Box,
@@ -10,26 +10,27 @@ import {
   TableRow,
   Paper,
   Typography,
-  Grid
-} from '@mui/material';
-import { PieChart, BarChart } from '@mui/x-charts';
-import Header from './layout/Header.jsx'
-import axios from 'axios';
-import { useQuery } from 'react-query';
-import CSVButton from './mui-components/CSVDownloadButton.jsx'
+  Grid,
+} from "@mui/material";
+import { PieChart, BarChart } from "@mui/x-charts";
+import Header from "./layout/Header.jsx";
+import axios from "axios";
+import { useQuery } from "react-query";
+import CSVButton from "./mui-components/CSVDownloadButton.jsx";
 
 const retrieveData = async (id) => {
-  const response = await axios.get(`http://localhost:5000/api/course-specific/getCourseData?param=${id}`);
+  const response = await axios.get(
+    `http://localhost:5000/api/course-specific/getCourseData?param=${id}`
+  );
   return response.data;
 };
 
 export default function CourseSpecificReport({ course, courseUnselect, id }) {
-
   const {
     data: resultData,
     error,
-    isLoading
-  } = useQuery(["data", id], () => retrieveData(id))
+    isLoading,
+  } = useQuery(["data", id], () => retrieveData(id));
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
@@ -40,20 +41,37 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   const feedbackGradeLevelData = resultData?.feedbackGradeLevelData;
   const feedbackSurveys = resultData?.feedbackSurveys;
   const qualitativeFeedbackLikes = resultData?.qualitativeFeedbackLikes;
-  const qualitativeFeedbackImprovements = resultData?.qualitativeFeedbackImprovements;
+  const qualitativeFeedbackImprovements =
+    resultData?.qualitativeFeedbackImprovements;
 
+  // sanitize labels in survey data to remove '#' and '>'
+  const sanitize = (s) => (s ?? "").toString().replace(/[>#]/g, "").trim();
+  const sanitizeData = (arr) =>
+    (arr || []).map((item) => {
+      const copy = { ...item };
+      ["label", "name", "x"].forEach((k) => {
+        if (copy[k]) copy[k] = sanitize(copy[k]);
+      });
+      return copy;
+    });
+  const sanitizedSurveys = (feedbackSurveys || []).map((s) => ({
+    ...s,
+    data: sanitizeData(s.data),
+  }));
+
+  const sanitizedFeedbackUserTypeData = sanitizeData(feedbackUserTypeData);
 
   return (
     <>
-      {course &&
+      {course && (
         <Box
           sx={{
             flexGrow: 1,
             mt: 6,
             mb: 8,
-            display: 'flex', // Enable Flexbox
-            flexDirection: 'column', // Stack items vertically
-            alignItems: 'center', // Center items horizontally
+            display: "flex", // Enable Flexbox
+            flexDirection: "column", // Stack items vertically
+            alignItems: "center", // Center items horizontally
           }}
         >
           <Typography variant="h3" marginRight="auto">
@@ -61,21 +79,20 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           </Typography>
           <Box
             sx={{
-              display: 'flex',
+              display: "flex",
               flexDirection: {
-                xs: 'column',
-                md: 'row',
+                xs: "column",
+                md: "row",
               },
-              alignItems: 'center',
+              alignItems: "center",
               justifyContent: {
-                xs: 'flex-start',
-                md: 'space-between',
+                xs: "flex-start",
+                md: "space-between",
               },
               mt: 2,
-              mb: 1
+              mb: 1,
             }}
-          >
-          </Box>
+          ></Box>
 
           <Grid container spacing={2}>
             <Grid item xs={4} key={0}>
@@ -84,24 +101,26 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   Enrollment Data
                 </Typography>
                 <PieChart
-                  series={[{
-                    data: enrollmentData,
-                    cx: "25%",
-                    cy: "50%",
-                  }]}
+                  series={[
+                    {
+                      data: enrollmentData,
+                      cx: "25%",
+                      cy: "50%",
+                    },
+                  ]}
                   margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   slotProps={{
                     legend: {
-                      direction: 'column',
-                      position: { vertical: 'middle', horizontal: 'middle' },
+                      direction: "column",
+                      position: { vertical: "middle", horizontal: "middle" },
                       padding: 0,
                       margin: 0,
                       labelStyle: {
                         fontSize: 11,
-                        width: '100px',
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                        height: 'auto'
+                        width: "100px",
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        height: "auto",
                       },
                       itemMarkWidth: 10,
                       itemMarkHeight: 10,
@@ -118,16 +137,18 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   User Types
                 </Typography>
                 <PieChart
-                  series={[{
-                    data: feedbackUserTypeData,
-                    cx: "20%",
-                    cy: "50%",
-                  }]}
+                  series={[
+                    {
+                      data: sanitizedFeedbackUserTypeData,
+                      cx: "20%",
+                      cy: "50%",
+                    },
+                  ]}
                   margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   slotProps={{
                     legend: {
-                      direction: 'column',
-                      position: { vertical: 'middle', horizontal: 'middle' },
+                      direction: "column",
+                      position: { vertical: "middle", horizontal: "middle" },
                       padding: 0,
                       margin: 0,
                       labelStyle: {
@@ -148,53 +169,52 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
             <Typography variant="h4" gutterBottom>
               Grade Levels Worked With
             </Typography>
-            {feedbackGradeLevelData &&
+            {feedbackGradeLevelData && (
               <BarChart
                 width={1200}
                 height={250}
-                series={[
-                  { data: feedbackGradeLevelData, id: "gradeLevel" }
-                ]}
-                xAxis={[{ data: gradeLevelLabels, scaleType: 'band' }]}
-              />}
+                series={[{ data: feedbackGradeLevelData, id: "gradeLevel" }]}
+                xAxis={[{ data: gradeLevelLabels, scaleType: "band" }]}
+              />
+            )}
           </Box>
-
 
           <Typography variant="h4" gutterBottom marginRight="auto">
             Feedback Surveys
           </Typography>
           {/*Surveys*/}
           <Grid container spacing={2}>
-            {feedbackSurveys.map((survey, index) => (
+            {sanitizedSurveys.map((survey, index) => (
               <Grid item xs={4} key={index}>
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'left'
-                  }}>
-                  <Typography variant="subtitle">
-                    {survey.label}
-                  </Typography>
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "left",
+                  }}
+                >
+                  <Typography variant="subtitle">{survey.label}</Typography>
                   <PieChart
-                    series={[{
-                      data: survey.data,
-                      cx: "15%",
-                      cy: "50%",
-                    }]}
+                    series={[
+                      {
+                        data: survey.data,
+                        cx: "15%",
+                        cy: "50%",
+                      },
+                    ]}
                     margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
                     slotProps={{
                       legend: {
-                        direction: 'column',
-                        position: { vertical: 'middle', horizontal: 'middle' },
+                        direction: "column",
+                        position: { vertical: "middle", horizontal: "middle" },
                         padding: 0,
                         margin: 0,
                         labelStyle: {
                           fontSize: 11,
-                          width: '100px',
-                          whiteSpace: 'normal',
-                          wordBreak: 'break-word',
-                          height: 'auto'
+                          width: "100px",
+                          whiteSpace: "normal",
+                          wordBreak: "break-word",
+                          height: "auto",
                         },
                         itemMarkWidth: 10,
                         itemMarkHeight: 10,
@@ -206,18 +226,28 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                 </Box>
               </Grid>
             ))}
-            <Grid item xs={4}> {/* Same size as pie charts */}
-              <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
+            <Grid item xs={4}>
+              {" "}
+              {/* Same size as pie charts */}
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="100%"
+              >
                 <Box
                   sx={{
-                    margin: 2
-                  }}>
+                    margin: 2,
+                  }}
+                >
                   <CSVButton jsonData={qualitativeFeedbackLikes} />
                 </Box>
                 <Box
                   sx={{
-                    margin: 2
-                  }}>
+                    margin: 2,
+                  }}
+                >
                   <CSVButton jsonData={qualitativeFeedbackImprovements} />
                 </Box>
               </Box>
@@ -226,9 +256,15 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           {/* < CSVButton jsonData={qualitativeFeedbackLikes} />
           < CSVButton jsonData={qualitativeFeedbackImprovements} /> */}
 
-          <Button variant="contained" onClick={() => courseUnselect(course.id)} sx={{ mt: 2, marginLeft: "auto" }}>Close Data</Button>
+          <Button
+            variant="contained"
+            onClick={() => courseUnselect(course.id)}
+            sx={{ mt: 2, marginLeft: "auto" }}
+          >
+            Close Data
+          </Button>
         </Box>
-      }
+      )}
     </>
   );
 }
