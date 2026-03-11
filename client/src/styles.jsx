@@ -10,6 +10,7 @@ export const getDesignTokens = (mode) => {
             },
             secondary: {
               main: "#000000",
+              on: "#FFFFFF",
             },
             tertiary: {
               main: "#BBBCBC",
@@ -37,83 +38,43 @@ export const getDesignTokens = (mode) => {
       fontSize: 14,
       h1: {
         fontFamily: ["Antonio", "sans-serif"].join(","),
-        fontSize: "4rem",
-        fontWeight: 900,
-        letterSpacing: "-0.02em",
+        fontSize: 40,
+        fontWeight: 800,
       },
       h2: {
-        fontFamily: ["Roboto", "sans-serif"].join(","),
+        fontFamily: ["Zilla Slab", "sans-serif"].join(","),
         fontSize: "2.25rem",
-        fontWeight: 600,
       },
       h3: {
-        fontFamily: ["Zilla Slab", "serif"].join(","),
-        fontSize: "1.75rem",
-        fontWeight: 500,
+        fontFamily: ["Roboto", "san-serif"].join(","),
+        fontSize: 18,
+        fontWeight: 600,
       },
       h4: {
         fontFamily: ["Roboto", "san-serif"].join(","),
-        fontSize: 24,
+        fontSize: 14,
         fontWeight: 600,
       },
       subtitle: {
-        fontSize: "12px",
+        fontSize: "14px",
         fontWeight: 400,
       },
       normaltext: {
-        fontSize: "12px",
+        fontSize: "14px",
         fontWeight: 400,
       },
       button: {
         fontStyle: "normal",
-        fontWeight: 700,
+        fontWeight: 400,
       },
       links: {
         fontFamily: "Roboto",
-        fontSize: 20,
+        fontSize: 14,
+      },
+      tableHeader: {
+        fontFamily: "Roboto",
+        fontSize: 14,
       },
     },
   };
 };
-
-// export const getDesignTokens = () => {
-//   return {
-//     cssVariables: true,
-//     colorSchemes: {
-//       light: {
-//         palette: {
-//           primary: {
-//             main: "#FFCD00",
-//           },
-//           secondary: {
-//             main: "#000000",
-//           },
-//           tertiary: {
-//             main: "#BBBCBC",
-//           },
-//           background: {
-//             default: "#FFFFFF",
-//             paper: "#F5F5F5",
-//           },
-//         },
-//       },
-//       dark: {
-//         palette: {
-//           primary: {
-//             main: "#FFCD00",
-//           },
-//           secondary: {
-//             main: "#FFFFFF",
-//           },
-//           tertiary: {
-//             main: "#BBBCBC",
-//           },
-//           background: {
-//             default: "#000000",
-//             paper: "#121212",
-//           },
-//         },
-//       },
-//     },
-//   };
-// };

@@ -23,9 +23,6 @@ const links = [
 const today = new Date();
 const year = today.getFullYear();
 
-//font sizes
-const normal_text = 24;
-
 export default function Footer() {
   return (
     <Paper elevation={0} component="footer" sx={{ position: "relative" }}>
@@ -33,15 +30,14 @@ export default function Footer() {
       <Box
         sx={{
           bgcolor: "#000000",
-          p: 2,
+          pt: 2,
         }}
       >
         <Container
           maxWidth={false}
           sx={{
-            ml: 0,
             pl: { xs: 2, md: 4, xl: 8 },
-            pb: 2,
+            pb: 8,
           }}
         >
           <Grid
@@ -54,7 +50,7 @@ export default function Footer() {
             }}
           >
             <Grid item xs={12} md={6}>
-              <Box className="logo--footer" sx={{ width: 400 }}>
+              <Box className="logo--footer" sx={{ width: 220 }}>
                 <img src={logo} alt="IRRC Logo" width={"100%"} />
               </Box>
               <Stack spacing={2} sx={{ mt: 2 }}>
@@ -93,7 +89,7 @@ export default function Footer() {
                 <Box>
                   <Typography
                     className="copyright"
-                    sx={{ color: "#fff", fontSize: 20 }}
+                    sx={{ color: "#fff", fontSize: 12 }}
                   >
                     © {year} Iowa Reading Research Center
                   </Typography>

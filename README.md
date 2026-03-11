@@ -71,8 +71,17 @@ To run the project locally
 <!-- To Do List -->
 <!--
 - make prettyyy
+
+- make charts responsive
+- add styling to charts for readability
 - course enrollment data debug
-- move unknown to bottom of table
-- why server keeps crashing in run dev
+- add asc, dsc headers
+- add column lines in table
+- make top charts side by side
+- make autoselect not yellow
+- color palette of piecharts
+
+- review react logic
+- put together presentation
 
 -->

@@ -91,7 +91,7 @@ export default function App() {
     />
   ));
 
-  console.log(enrollmentData);
+  // console.log(enrollmentData);
 
   return (
     <ThemeProvider theme={theme}>
@@ -100,28 +100,24 @@ export default function App() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
         <Navbar />
         <Box
           sx={{
-            mt: 16,
+            mt: 18,
             mb: 0,
             ml: "auto",
             mr: "auto",
           }}
         >
-          <Typography variant="h1" fontWeight={600}>
-            IRRC Dashboard
-          </Typography>
+          <Typography variant="h1">Moodle Analytics Dashboard</Typography>
         </Box>
         <Box
           sx={{
-            mt: 4,
-            mb: 4,
-            ml: 16,
-            mr: 16,
+            mt: 6,
+            ml: { xs: 2, md: 4, xl: 8 },
+            mr: { xs: 2, md: 4, xl: 8 },
           }}
         >
           {!isLoading && (
@@ -142,29 +138,20 @@ export default function App() {
 
         <Box
           sx={{
-            mt: 0,
-            mb: 16,
-            ml: 16,
-            mr: 16,
+            mb: 8,
+            ml: { xs: 2, md: 4, xl: 8 },
+            mr: { xs: 2, md: 4, xl: 8 },
           }}
         >
           <Box
             sx={{
               display: "flex",
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
-              alignItems: "center",
-              justifyContent: {
-                xs: "flex-start",
-                md: "space-between",
-              },
-              mt: 2,
-              mb: 1,
+              alignItems: "left",
             }}
           >
-            <Typography variant="h2">Course Data</Typography>
+            <Typography variant="normaltext" sx={{ mb: 1 }}>
+              See information for specific courses.
+            </Typography>
           </Box>
           {!isLoading && (
             <AutocompleteSelector

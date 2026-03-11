@@ -35,28 +35,46 @@ export default function CummulativeReport({
           mb: 8,
         }}
       >
-        <Typography variant="h4">User Demographic</Typography>
+        <Typography variant="h3" sx={{ mb: 2 }}>
+          User Demographics
+        </Typography>
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table
               stickyHeader
               aria-label="sticky table"
-              sx={{ minWidth: 650 }}
+              sx={{
+                minWidth: 650,
+              }}
               size="small"
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>User Type</TableCell>
-                  <TableCell align="right">Number</TableCell>
+                  <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                    <Typography
+                      variant="tableHeader"
+                      sx={{ color: "secondary.on" }}
+                    >
+                      User Type
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ backgroundColor: "secondary.main" }}
+                  >
+                    <Typography
+                      variant="tableHeader"
+                      sx={{ color: "secondary.on" }}
+                    >
+                      Number
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data.userTypes?.map(function (type) {
                   return (
-                    <TableRow
-                      key={type.data}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
+                    <TableRow hover key={type.data}>
                       <TableCell component="th" scope="row">
                         {type.data}
                       </TableCell>
@@ -76,7 +94,9 @@ export default function CummulativeReport({
           mb: 8,
         }}
       >
-        <Typography variant="h4">States</Typography>
+        {/* <Typography variant="h3" sx={{ mb: 2 }}>
+          States
+        </Typography> */}
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table
@@ -87,8 +107,25 @@ export default function CummulativeReport({
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>States</TableCell>
-                  <TableCell align="right">Number</TableCell>
+                  <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                    <Typography
+                      variant="tableHeader"
+                      sx={{ color: "secondary.on" }}
+                    >
+                      States
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ backgroundColor: "secondary.main" }}
+                  >
+                    <Typography
+                      variant="tableHeader"
+                      sx={{ color: "secondary.on" }}
+                    >
+                      Number
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -98,10 +135,7 @@ export default function CummulativeReport({
                     return st !== "unknown" && st !== "";
                   })
                   .map(({ state, count }) => (
-                    <TableRow
-                      key={state}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
+                    <TableRow hover key={state}>
                       <TableCell component="th" scope="row">
                         {state}
                       </TableCell>
@@ -163,7 +197,9 @@ export default function CummulativeReport({
             mb: 8,
           }}
         >
-          <Typography variant="h4">Course Enrollment</Typography>
+          <Typography variant="h3" sx={{ mb: 2 }}>
+            Course Enrollment
+          </Typography>
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table
@@ -174,22 +210,64 @@ export default function CummulativeReport({
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell>Course</TableCell>
-                    <TableCell align="right">Completed Users</TableCell>
-                    <TableCell align="right">Total Users</TableCell>
-                    <TableCell align="right">Recently Completed</TableCell>
-                    <TableCell align="right">Recently Enrolled</TableCell>
+                    <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "secondary.on" }}
+                      >
+                        Course
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ backgroundColor: "secondary.main" }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "secondary.on" }}
+                      >
+                        Completed Users
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ backgroundColor: "secondary.main" }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "secondary.on" }}
+                      >
+                        Total Users
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ backgroundColor: "secondary.main" }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "secondary.on" }}
+                      >
+                        Recently Completed
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ backgroundColor: "secondary.main" }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "secondary.on" }}
+                      >
+                        Recently Enrolled
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {enrollmentData?.map(function (course) {
                     return (
-                      <TableRow
-                        key={course.id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
+                      <TableRow hover key={course.id}>
                         <TableCell component="th" scope="row">
                           {course.course_name}
                         </TableCell>

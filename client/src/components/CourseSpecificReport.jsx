@@ -20,7 +20,7 @@ import CSVButton from "./mui-components/CSVDownloadButton.jsx";
 
 const retrieveData = async (id) => {
   const response = await axios.get(
-    `http://localhost:5000/api/course-specific/getCourseData?param=${id}`
+    `http://localhost:5000/api/course-specific/getCourseData?param=${id}`,
   );
   return response.data;
 };
@@ -44,22 +44,42 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   const qualitativeFeedbackImprovements =
     resultData?.qualitativeFeedbackImprovements;
 
-  // sanitize labels in survey data to remove '#' and '>'
-  const sanitize = (s) => (s ?? "").toString().replace(/[>#]/g, "").trim();
-  const sanitizeData = (arr) =>
-    (arr || []).map((item) => {
-      const copy = { ...item };
-      ["label", "name", "x"].forEach((k) => {
-        if (copy[k]) copy[k] = sanitize(copy[k]);
-      });
-      return copy;
-    });
-  const sanitizedSurveys = (feedbackSurveys || []).map((s) => ({
+  console.log(feedbackSurveys);
+
+  // clean labels in survey data to remove '#' and '>'
+  // const clean = (s) => (s ?? "").toString().replace(/[>#]/g, "").trim();
+
+  const clean = (s) => {
+    let str = (s ?? "").toString();
+
+    return str
+      .replace(/(\d)[#]/g, "") // clean up number ratings
+      .replace(/[>#]/g, "") // Remove remaining > and #
+      .replace(/^r\s*/, "") // Remove the "r" prefix found in your data
+      .trim();
+  };
+  const cleanData = (arr) =>
+    (arr || [])
+      .filter((item) => !item.label?.includes("Choice")) // Remove junk rows
+      .map((item) => ({
+        ...item,
+        label: clean(item.label),
+        // If your user type data uses 'name' or 'x' instead of 'label', clean those too:
+        ...(item.name && { name: clean(item.name) }),
+        ...(item.x && { x: clean(item.x) }),
+      }));
+  const cleanedSurveys = (feedbackSurveys || []).map((s) => ({
     ...s,
-    data: sanitizeData(s.data),
+    data: cleanData(s.data).sort((a, b) => b.value - a.value),
   }));
 
-  const sanitizedFeedbackUserTypeData = sanitizeData(feedbackUserTypeData);
+  const cleanedFeedbackUserTypeData = cleanData(feedbackUserTypeData).sort(
+    (a, b) => b.value - a.value,
+  );
+
+  const cleanedgradeLevelLabels = gradeLevelLabels.map((str) =>
+    str.replace(/^[a-z]>>>>>/, "").trim(),
+  );
 
   return (
     <>
@@ -101,6 +121,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   Enrollment Data
                 </Typography>
                 <PieChart
+                  colors={["black", "yellow"]} // use palette
                   series={[
                     {
                       data: enrollmentData,
@@ -116,7 +137,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                       padding: 0,
                       margin: 0,
                       labelStyle: {
-                        fontSize: 11,
+                        fontSize: 14,
                         width: "100px",
                         whiteSpace: "normal",
                         wordBreak: "break-word",
@@ -139,7 +160,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                 <PieChart
                   series={[
                     {
-                      data: sanitizedFeedbackUserTypeData,
+                      data: cleanedFeedbackUserTypeData,
                       cx: "20%",
                       cy: "50%",
                     },
@@ -152,7 +173,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                       padding: 0,
                       margin: 0,
                       labelStyle: {
-                        fontSize: 11,
+                        fontSize: 14,
                       },
                       itemMarkWidth: 10,
                       itemMarkHeight: 10,
@@ -174,7 +195,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                 width={1200}
                 height={250}
                 series={[{ data: feedbackGradeLevelData, id: "gradeLevel" }]}
-                xAxis={[{ data: gradeLevelLabels, scaleType: "band" }]}
+                xAxis={[{ data: cleanedgradeLevelLabels, scaleType: "band" }]}
               />
             )}
           </Box>
@@ -184,7 +205,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           </Typography>
           {/*Surveys*/}
           <Grid container spacing={2}>
-            {sanitizedSurveys.map((survey, index) => (
+            {cleanedSurveys.map((survey, index) => (
               <Grid item xs={4} key={index}>
                 <Box
                   sx={{
@@ -210,7 +231,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                         padding: 0,
                         margin: 0,
                         labelStyle: {
-                          fontSize: 11,
+                          fontSize: 14,
                           width: "100px",
                           whiteSpace: "normal",
                           wordBreak: "break-word",

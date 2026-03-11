@@ -1,21 +1,19 @@
-import React from 'react';
-import { AppBar, Box, Toolbar } from '@mui/material';
+import React from "react";
+import { AppBar, Box, Toolbar } from "@mui/material";
 
-import logo from '~/assets/irrc.svg';
+import logo from "~/assets/irrc.svg";
 
 const Navbar = () => {
   return (
-    <AppBar 
-      position="absolute" 
-      color="secondary" 
-      sx={{ 
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        height: '8'
+    <AppBar
+      position="absolute"
+      sx={{
+        backgroundColor: "primary.main",
       }}
     >
-      <Toolbar disableGutters sx={{ paddingX: { xs: 1, md: 2 } }}>
-        <Box display="flex" sx={{ height: '100%' }}>
-          <img src={logo} alt="IRRC Logo" width={200} />
+      <Toolbar sx={{ pl: { xs: 2, md: 4, xl: 8 } }}>
+        <Box display="flex" sx={{ width: 200, pt: 2, pb: 2 }}>
+          <img src={logo} alt="IRRC Logo" width={"100%"} />
         </Box>
       </Toolbar>
     </AppBar>
