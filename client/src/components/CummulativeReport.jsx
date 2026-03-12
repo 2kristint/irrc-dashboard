@@ -32,7 +32,7 @@ export default function CummulativeReport({
       <Box
         sx={{
           flexGrow: 1,
-          mb: 8,
+          mb: 4,
         }}
       >
         <Typography variant="h3" sx={{ mb: 2 }}>
@@ -40,31 +40,24 @@ export default function CummulativeReport({
         </Typography>
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
-            <Table
-              stickyHeader
-              aria-label="sticky table"
-              sx={{
-                minWidth: 650,
-              }}
-              size="small"
-            >
+            <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                  <TableCell sx={{ backgroundColor: "primary.main" }}>
                     <Typography
                       variant="tableHeader"
-                      sx={{ color: "secondary.on" }}
+                      sx={{ color: "primary.on" }}
                     >
                       User Type
                     </Typography>
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{ backgroundColor: "secondary.main" }}
+                    sx={{ backgroundColor: "primary.main" }}
                   >
                     <Typography
                       variant="tableHeader"
-                      sx={{ color: "secondary.on" }}
+                      sx={{ color: "primary.on" }}
                     >
                       Number
                     </Typography>
@@ -91,7 +84,7 @@ export default function CummulativeReport({
       <Box
         sx={{
           flexGrow: 1,
-          mb: 8,
+          mb: 0,
         }}
       >
         {/* <Typography variant="h3" sx={{ mb: 2 }}>
@@ -99,29 +92,24 @@ export default function CummulativeReport({
         </Typography> */}
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
-            <Table
-              stickyHeader
-              aria-label="sticky table"
-              sx={{ minWidth: 650 }}
-              size="small"
-            >
+            <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                  <TableCell sx={{ backgroundColor: "primary.main" }}>
                     <Typography
                       variant="tableHeader"
-                      sx={{ color: "secondary.on" }}
+                      sx={{ color: "primary.on" }}
                     >
                       States
                     </Typography>
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{ backgroundColor: "secondary.main" }}
+                    sx={{ backgroundColor: "primary.main" }}
                   >
                     <Typography
                       variant="tableHeader"
-                      sx={{ color: "secondary.on" }}
+                      sx={{ color: "primary.on" }}
                     >
                       Number
                     </Typography>
@@ -153,6 +141,7 @@ export default function CummulativeReport({
           display: "flex",
           flexDirection: "row",
           justifyContent: "flex-end",
+          mt: 4,
         }}
       >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -194,7 +183,6 @@ export default function CummulativeReport({
         <Box
           sx={{
             flexGrow: 1,
-            mb: 8,
           }}
         >
           <Typography variant="h3" sx={{ mb: 2 }}>
@@ -210,56 +198,124 @@ export default function CummulativeReport({
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ backgroundColor: "secondary.main" }}>
+                    <TableCell
+                      rowSpan={2}
+                      colSpan={1}
+                      sx={{
+                        backgroundColor: "primary.main",
+                        top: 0,
+                        pt: 2,
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
+                    >
                       <Typography
                         variant="tableHeader"
-                        sx={{ color: "secondary.on" }}
+                        sx={{ color: "primary.on" }}
                       >
                         Course
                       </Typography>
                     </TableCell>
                     <TableCell
-                      align="right"
-                      sx={{ backgroundColor: "secondary.main" }}
+                      colSpan={2}
+                      rowSpan={1}
+                      align="center"
+                      sx={{
+                        backgroundColor: "primary.main",
+                        top: 0,
+                        pt: 2,
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                        borderBottom: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
                     >
                       <Typography
                         variant="tableHeader"
-                        sx={{ color: "secondary.on" }}
+                        sx={{ color: "primary.on" }}
+                      >
+                        Cumulative Totals (All Time)
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      colSpan={2}
+                      rowSpan={1}
+                      align="center"
+                      sx={{
+                        backgroundColor: "primary.main",
+                        top: 0,
+                        pt: 2,
+                        borderBottom: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "primary.on" }}
+                      >
+                        Activity {"("}
+                        {from.format("MM/YYYY")} - {to.format("MM/YYYY")}
+                        {")"}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell
+                      colSpan={1}
+                      align="center"
+                      sx={{
+                        backgroundColor: "tertiary.main",
+                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
+                    >
+                      <Typography
+                        variant="tableHeader"
+                        sx={{ color: "tertiary.on" }}
                       >
                         Completed Users
                       </Typography>
                     </TableCell>
                     <TableCell
-                      align="right"
-                      sx={{ backgroundColor: "secondary.main" }}
+                      align="center"
+                      colSpan={1}
+                      sx={{
+                        backgroundColor: "tertiary.main",
+                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
                     >
                       <Typography
                         variant="tableHeader"
-                        sx={{ color: "secondary.on" }}
+                        sx={{ color: "tertiary.on" }}
                       >
                         Total Users
                       </Typography>
                     </TableCell>
                     <TableCell
-                      align="right"
-                      sx={{ backgroundColor: "secondary.main" }}
+                      align="center"
+                      sx={{
+                        backgroundColor: "tertiary.main",
+                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
                     >
                       <Typography
                         variant="tableHeader"
-                        sx={{ color: "secondary.on" }}
+                        sx={{ color: "tertiary.on" }}
                       >
-                        Recently Completed
+                        Completions
                       </Typography>
                     </TableCell>
                     <TableCell
-                      align="right"
-                      sx={{ backgroundColor: "secondary.main" }}
+                      align="center"
+                      sx={{
+                        backgroundColor: "tertiary.main",
+                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        borderRight: "2px solid rgba(255, 255, 255, 0.3)",
+                      }}
                     >
                       <Typography
                         variant="tableHeader"
-                        sx={{ color: "secondary.on" }}
+                        sx={{ color: "tertiary.on" }}
                       >
-                        Recently Enrolled
+                        Enrollments
                       </Typography>
                     </TableCell>
                   </TableRow>

@@ -105,7 +105,7 @@ export default function App() {
         <Navbar />
         <Box
           sx={{
-            mt: 18,
+            mt: 16,
             mb: 0,
             ml: "auto",
             mr: "auto",
@@ -115,7 +115,7 @@ export default function App() {
         </Box>
         <Box
           sx={{
-            mt: 6,
+            mt: 4,
             ml: { xs: 2, md: 4, xl: 8 },
             mr: { xs: 2, md: 4, xl: 8 },
           }}
@@ -138,6 +138,7 @@ export default function App() {
 
         <Box
           sx={{
+            mt: 4,
             mb: 8,
             ml: { xs: 2, md: 4, xl: 8 },
             mr: { xs: 2, md: 4, xl: 8 },

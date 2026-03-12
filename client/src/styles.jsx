@@ -1,12 +1,26 @@
 export const getDesignTokens = (mode) => {
   return {
-    components: {},
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          contained: {
+            backgroundColor: "#000000",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#63666A", // Darker shade on hover
+              color: "#ffffff",
+            },
+          },
+        },
+      },
+    },
     palette: {
       mode,
       ...(mode === "light"
         ? {
             primary: {
               main: "#FFCD00",
+              on: "#000000",
             },
             secondary: {
               main: "#000000",
@@ -14,9 +28,11 @@ export const getDesignTokens = (mode) => {
             },
             tertiary: {
               main: "#BBBCBC",
+              on: "#000000",
             },
             background: {
               default: "#FFFFFF",
+              dim: "#e0e0e0",
             },
           }
         : {

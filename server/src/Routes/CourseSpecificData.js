@@ -5,484 +5,318 @@ const db = require("../Config/DatabaseConfig");
 router.get("/getCourseData", async (req, res) => {
   const param = req.query.param;
   try {
-    //Number of users enrolled and completed query
-    const enrollmentDataQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT c.fullname AS course_name,
-                        COUNT(cs.timecompleted) AS total_complete,
-                        COUNT(*) AS total_enrolled
-                        FROM dbgyt2oi9llwgg.mdlxk_course_completions AS cs
-                        JOIN dbgyt2oi9llwgg.mdlxk_course AS c ON cs.course=c.id
-                        LEFT JOIN dbgyt2oi9llwgg.mdlxk_user_info_data AS u ON cs.userid = u.userid
-                        WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'AND c.id = ${param}
-                        GROUP BY c.id`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    //** PreCourse survey queries **//
-    const userTypeChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const userTypeAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const gradeLevelChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                        AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const gradeLevelAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `WITH RECURSIVE numbers AS (
-                        SELECT 1 AS num
-                        UNION ALL
-                        SELECT num + 1
-                        FROM numbers
-                        WHERE num < 10
-                    ),
-                    split_answers AS (
-                        SELECT
-                            quizzes.name AS quiz,
-                            quizzes.course,
-                            quizzes.id AS quiz_id,
-                            questions.name AS question_name,
-                            questions.id AS question_id,
-                            TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(answers.value, '|', numbers.num), '|', -1)) AS answer
-                        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                            ON quizzes.id = questions.feedback
-                        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                            ON questions.id = answers.item
-                        JOIN numbers ON CHAR_LENGTH(answers.value)
-                            - CHAR_LENGTH(REPLACE(answers.value, '|', '')) >= numbers.num - 1
-                        WHERE quizzes.course = ${param}
-                            AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
-                            AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%')
-                    )
-                    SELECT
-                        answer,
-                        COUNT(*) AS answerCount
-                    FROM split_answers
-                    WHERE answer <> ''
-                    GROUP BY answer
-                    ORDER BY answer;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    //Course feedback queries
-    const Q1_OverallFeedbackChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q1_OverallFeedbackAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q2_ApplicableChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%In your position, how applicable was the content presented in this learning module?%');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q2_ApplicableAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q3_EngagingAppropriateChoicesQuery = new Promise(
-      (resolve, reject) => {
-        db.query(
-          `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%The course material was engaging and appropriate for the topic.%');`,
-          (err, results) => {
-            if (err) reject(err);
-            else resolve(results);
-          },
-        );
-      },
+    const [enrollmentData] = await db.query(
+      `SELECT c.fullname AS course_name,
+        COUNT(cs.timecompleted) AS total_complete,
+       (COUNT(*) - COUNT(cs.timecompleted)) AS total_enrolled
+        FROM dbgyt2oi9llwgg.mdlxk_course_completions AS cs
+        JOIN dbgyt2oi9llwgg.mdlxk_course AS c ON cs.course=c.id
+        LEFT JOIN dbgyt2oi9llwgg.mdlxk_user_info_data AS u ON cs.userid = u.userid
+        WHERE u.data NOT LIKE '%IRRC%' AND u.fieldid = '3'AND c.id = ${param}
+        GROUP BY c.id`,
     );
-
-    const Q3_EngagingAppropriateAnswersQuery = new Promise(
-      (resolve, reject) => {
-        db.query(
-          `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%The course material was engaging and appropriate for the topic.%')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-          (err, results) => {
-            if (err) reject(err);
-            else resolve(results);
-          },
-        );
-      },
+    const [userTypeChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):');`,
     );
-
-    const Q4_NavigateChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%How easy was it to navigate this learning module%');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q4_NavigateAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%How easy was it to navigate this learning module%')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q5_TechnologyChoicesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        questions.presentation AS answer_choices
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%How often did you encounter issues related to the learning module technology?%');`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const Q5_TechnologyAnswersQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        quizzes.name AS quiz,
-                        quizzes.course,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value AS answer,
-                        COUNT(answers.value) AS answerCount
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    WHERE quizzes.course =  ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%How often did you encounter issues related to the learning module technology?%')
-                    GROUP BY questions.id, quizzes.id, answers.value
-                    ORDER BY quizzes.id, questions.id;`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const qualitativeFeedbackLikesQuery = new Promise((resolve, reject) => {
-      db.query(
-        `SELECT
-                        course.fullname,
-                        quizzes.course,
-                        quizzes.name AS quiz,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    JOIN dbgyt2oi9llwgg.mdlxk_course course
-	                    ON quizzes.course = course.id
-                    WHERE quizzes.course = ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%What did you like most about this learning module?%')
-                        AND answers.value <> '';`,
-        (err, results) => {
-          if (err) reject(err);
-          else resolve(results);
-        },
-      );
-    });
-
-    const qualitativeFeedbackImprovementsQuery = new Promise(
-      (resolve, reject) => {
-        db.query(
-          `SELECT
-                        course.fullname,
-                        quizzes.course,
-                        quizzes.name AS quiz,
-                        quizzes.id AS quiz_id,
-                        questions.name AS question_name,
-                        questions.id AS question_id,
-                        answers.value
-                    FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
-                        ON quizzes.id = questions.feedback
-                    JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
-                        ON questions.id = answers.item
-                    JOIN dbgyt2oi9llwgg.mdlxk_course course
-	                    ON quizzes.course = course.id
-                    WHERE quizzes.course = ${param}
-                        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
-                        AND LOWER(questions.name) LIKE LOWER('%What aspects of the learning module could be improved?%')
-                        AND answers.value <> '';`,
-          (err, results) => {
-            if (err) reject(err);
-            else resolve(results);
-          },
-        );
-      },
+    const [userTypeAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+        AND LOWER(questions.name) LIKE LOWER('%I am taking this eLearning module as a(n):')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
     );
-
-    // Wait for all queries to complete
-    const [
-      enrollmentData,
-      userTypeChoices,
-      userTypeAnswers,
-      gradeLevelChoices,
-      gradeLevelAnswers,
-      Q1_OverallFeedbackChoices,
-      Q1_OverallFeedbackAnswers,
-      Q2_ApplicableChoices,
-      Q2_ApplicableAnswers,
-      Q3_EngagingAppropriateChoices,
-      Q3_EngagingAppropriateAnswers,
-      Q4_NavigateChoices,
-      Q4_NavigateAnswers,
-      Q5_TechnologyChoices,
-      Q5_TechnologyAnswers,
-      qualitativeFeedbackLikes,
-      qualitativeFeedbackImprovements,
-    ] = await Promise.all([
-      enrollmentDataQuery,
-      userTypeChoicesQuery,
-      userTypeAnswersQuery,
-      gradeLevelChoicesQuery,
-      gradeLevelAnswersQuery,
-      Q1_OverallFeedbackChoicesQuery,
-      Q1_OverallFeedbackAnswersQuery,
-      Q2_ApplicableChoicesQuery,
-      Q2_ApplicableAnswersQuery,
-      Q3_EngagingAppropriateChoicesQuery,
-      Q3_EngagingAppropriateAnswersQuery,
-      Q4_NavigateChoicesQuery,
-      Q4_NavigateAnswersQuery,
-      Q5_TechnologyChoicesQuery,
-      Q5_TechnologyAnswersQuery,
-      qualitativeFeedbackLikesQuery,
-      qualitativeFeedbackImprovementsQuery,
-    ]);
+    const [gradeLevelChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+        AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%');`,
+    );
+    const [gradeLevelAnswers] = await db.query(
+      `WITH RECURSIVE numbers AS (
+        SELECT 1 AS num
+        UNION ALL
+        SELECT num + 1
+        FROM numbers
+        WHERE num < 10
+      ),
+      split_answers AS (
+        SELECT
+          quizzes.name AS quiz,
+          quizzes.course,
+          quizzes.id AS quiz_id,
+          questions.name AS question_name,
+          questions.id AS question_id,
+          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(answers.value, '|', numbers.num), '|', -1)) AS answer
+          FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+          JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+          ON quizzes.id = questions.feedback
+          JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+          ON questions.id = answers.item
+          JOIN numbers ON CHAR_LENGTH(answers.value)
+          - CHAR_LENGTH(REPLACE(answers.value, '|', '')) >= numbers.num - 1
+          WHERE quizzes.course = ${param}
+          AND LOWER(quizzes.name) LIKE LOWER('%Pre-Course Survey%')
+          AND LOWER(questions.name) LIKE LOWER('%With what grade level(s) do you primarily work (or plan to work) ?%')
+      )
+      SELECT
+        answer,
+        COUNT(*) AS answerCount
+        FROM split_answers
+        WHERE answer <> ''
+        GROUP BY answer
+        ORDER BY answer;`,
+    );
+    const [Q1_OverallFeedbackChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%');`,
+    );
+    const [Q1_OverallFeedbackAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
+    );
+    const [Q2_ApplicableChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%In your position, how applicable was the content presented in this learning module?%');`,
+    );
+    const [Q2_ApplicableAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%Overall, how satisfied or dissatisfied are you with this learning module?%')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
+    );
+    const [Q3_EngagingAppropriateChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%The course material was engaging and appropriate for the topic.%');`,
+    );
+    const [Q3_EngagingAppropriateAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%The course material was engaging and appropriate for the topic.%')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
+    );
+    const [Q4_NavigateChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%How easy was it to navigate this learning module%');`,
+    );
+    const [Q4_NavigateAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%How easy was it to navigate this learning module%')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
+    );
+    const [Q5_TechnologyChoices] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        questions.presentation AS answer_choices
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%How often did you encounter issues related to the learning module technology?%');`,
+    );
+    const [Q5_TechnologyAnswers] = await db.query(
+      `SELECT
+        quizzes.name AS quiz,
+        quizzes.course,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value AS answer,
+        COUNT(answers.value) AS answerCount
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        WHERE quizzes.course =  ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Course Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%How often did you encounter issues related to the learning module technology?%')
+        GROUP BY questions.id, quizzes.id, answers.value
+        ORDER BY quizzes.id, questions.id;`,
+    );
+    const [qualitativeFeedbackLikes] = await db.query(
+      `SELECT
+        course.fullname,
+        quizzes.course,
+        quizzes.name AS quiz,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        JOIN dbgyt2oi9llwgg.mdlxk_course course
+        ON quizzes.course = course.id
+        WHERE quizzes.course = ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%What did you like most about this learning module?%')
+        AND answers.value <> '';`,
+    );
+    const [qualitativeFeedbackImprovements] = await db.query(
+      `SELECT
+        course.fullname,
+        quizzes.course,
+        quizzes.name AS quiz,
+        quizzes.id AS quiz_id,
+        questions.name AS question_name,
+        questions.id AS question_id,
+        answers.value
+        FROM dbgyt2oi9llwgg.mdlxk_feedback quizzes
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_item questions
+        ON quizzes.id = questions.feedback
+        JOIN dbgyt2oi9llwgg.mdlxk_feedback_value answers
+        ON questions.id = answers.item
+        JOIN dbgyt2oi9llwgg.mdlxk_course course
+        ON quizzes.course = course.id
+        WHERE quizzes.course = ${param}
+        AND LOWER(quizzes.name) LIKE LOWER('%Feedback%')
+        AND LOWER(questions.name) LIKE LOWER('%What aspects of the learning module could be improved?%')
+        AND answers.value <> '';`,
+    );
 
     //** format data **//
 
