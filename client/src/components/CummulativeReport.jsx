@@ -38,6 +38,7 @@ export default function CummulativeReport({
         <Typography variant="h3" sx={{ mb: 2 }}>
           User Demographics
         </Typography>
+
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table" size="small">
