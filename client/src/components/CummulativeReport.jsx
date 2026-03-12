@@ -261,7 +261,7 @@ export default function CummulativeReport({
                       align="center"
                       sx={{
                         backgroundColor: "tertiary.main",
-                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        top: { xs: 72, sm: 72, md: 48, lg: 48 },
                         borderRight: "2px solid rgba(255, 255, 255, 0.3)",
                       }}
                     >
@@ -277,7 +277,7 @@ export default function CummulativeReport({
                       colSpan={1}
                       sx={{
                         backgroundColor: "tertiary.main",
-                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        top: { xs: 72, sm: 72, md: 48, lg: 48 },
                         borderRight: "2px solid rgba(255, 255, 255, 0.3)",
                       }}
                     >
@@ -292,7 +292,7 @@ export default function CummulativeReport({
                       align="center"
                       sx={{
                         backgroundColor: "tertiary.main",
-                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        top: { xs: 72, sm: 72, md: 48, lg: 48 },
                         borderRight: "2px solid rgba(255, 255, 255, 0.3)",
                       }}
                     >
@@ -307,7 +307,7 @@ export default function CummulativeReport({
                       align="center"
                       sx={{
                         backgroundColor: "tertiary.main",
-                        top: { xs: 72, sm: 42, md: 40, lg: 48 },
+                        top: { xs: 72, sm: 72, md: 48, lg: 48 },
                         borderRight: "2px solid rgba(255, 255, 255, 0.3)",
                       }}
                     >

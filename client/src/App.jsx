@@ -70,7 +70,7 @@ export default function App() {
 
   const handleCourseSelect = (course) => {
     if (course && !selectedCourses.some((c) => c.id === course.id)) {
-      setSelectedCourses((prevState) => [...prevState, course]);
+      setSelectedCourses((prevState) => [course, ...prevState]);
     }
   };
 

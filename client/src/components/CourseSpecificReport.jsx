@@ -72,14 +72,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
       .map((item) => ({
         ...item,
         label: clean(item.label),
-        // If your user type data uses 'name' or 'x' instead of 'label', clean those too:
-        ...(item.name && { name: clean(item.name) }),
-        ...(item.x && { x: clean(item.x) }),
       }));
-  const cleanedSurveys = (feedbackSurveys || []).map((s) => ({
-    ...s,
-    data: cleanData(s.data).sort((a, b) => b.value - a.value),
-  }));
 
   const cleanedFeedbackUserTypeData = cleanData(feedbackUserTypeData).sort(
     (a, b) => b.value - a.value,
@@ -88,6 +81,30 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
   const cleanedgradeLevelLabels = gradeLevelLabels.map((str) =>
     str.replace(/^[a-z]>>>>>/, "").trim(),
   );
+
+  const addPercentages = (arr) => {
+    const dataArray = arr || [];
+    const currentTotal = dataArray.reduce(
+      (acc, item) => acc + (Number(item.value) || 0),
+      0,
+    );
+
+    return dataArray
+      .filter((item) => !item.label?.includes("Choice"))
+      .map((item) => ({
+        ...item,
+        label: clean(item.label),
+        value:
+          currentTotal > 0
+            ? parseFloat(((item.value / currentTotal) * 100).toFixed(1))
+            : 0,
+      }));
+  };
+
+  const cleanedSurveys = (feedbackSurveys || []).map((s) => ({
+    ...s,
+    data: addPercentages(s.data).sort((a, b) => b.value - a.value),
+  }));
 
   return (
     <>
@@ -116,22 +133,31 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   p: 2,
                   borderRadius: 1,
                   backgroundColor: "background.dim",
-                  height: { xs: 200, sm: 300, md: 400, lg: 400 },
+                  height: { xs: 300, sm: 300, md: 400, lg: 400 },
                 }}
               >
                 <Typography variant="h4" gutterBottom>
                   Enrollment Data
                 </Typography>
                 <PieChart
-                  // colors={["black", "yellow"]} // use palette
+                  colors={[
+                    "#00558C",
+                    "#04a2a2",
+                    "#00664F",
+                    "#74b22d",
+                    "#c17626",
+                    "#c29f22",
+                    "#BD472A",
+                  ]}
                   series={[
                     {
                       data: enrollmentData,
                       cx: "30%",
                       cy: "50%",
+                      highlightScope: { fade: "global", highlight: "item" },
                     },
                   ]}
-                  height={200}
+                  height={220}
                   margin={{ top: 10, bottom: 10, left: 0, right: 10 }}
                   slotProps={{
                     legend: {
@@ -166,16 +192,25 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   User Types
                 </Typography>
                 <PieChart
+                  colors={[
+                    "#00558C",
+                    "#04a2a2",
+                    "#00664F",
+                    "#74b22d",
+                    "#c17626",
+                    "#c29f22",
+                    "#BD472A",
+                  ]}
                   series={[
                     {
                       data: cleanedFeedbackUserTypeData,
                       cx: "30%",
                       cy: "50%",
-                      innerRadius: 30,
-                      outerRadius: 100,
+                      outerRadius: 120,
+                      highlightScope: { fade: "global", highlight: "item" },
                     },
                   ]}
-                  height={520}
+                  height={440}
                   margin={{ top: 10, bottom: 10, left: 0, right: 10 }}
                   slotProps={{
                     legend: {
@@ -224,6 +259,19 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                       tickLabelStyle: {
                         fontSize: 11,
                       },
+                      colorMap: {
+                        type: "ordinal",
+                        values: cleanedgradeLevelLabels,
+                        colors: [
+                          "#00558C",
+                          "#04a2a2",
+                          "#00664F",
+                          "#74b22d",
+                          "#c17626",
+                          "#c29f22",
+                          "#BD472A",
+                        ],
+                      },
                     },
                   ]}
                   margin={{ bottom: 70 }}
@@ -238,7 +286,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
           {/*Surveys*/}
           <Grid container spacing={2}>
             {cleanedSurveys.map((survey, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid item xs={12} md={6} lg={4} key={index}>
                 <Box
                   sx={{
                     display: "flex",
@@ -252,6 +300,15 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                   <Typography variant="subtitle">{survey.label}</Typography>
                   <Box>
                     <PieChart
+                      colors={[
+                        "#56A0D2",
+                        "#04B9B9",
+                        "#58A77E",
+                        "#74b22d",
+                        "#c17626",
+                        "#c29f22",
+                        "#BD472A",
+                      ]}
                       series={[
                         {
                           data: survey.data,
@@ -259,6 +316,10 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                           cy: "50%",
                           innerRadius: 30,
                           outerRadius: 80,
+                          arcLabel: (item) => `${item.value}%`,
+                          arcLabelMinAngle: 35,
+                          arcLabelRadius: "50%",
+                          highlightScope: { fade: "global", highlight: "item" },
                         },
                       ]}
                       height={300}
@@ -284,7 +345,7 @@ export default function CourseSpecificReport({ course, courseUnselect, id }) {
                 </Box>
               </Grid>
             ))}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6} lg={4}>
               {/* Same size as pie charts */}
               <Box display="flex" flexDirection="column" alignItems="left">
                 <Box>

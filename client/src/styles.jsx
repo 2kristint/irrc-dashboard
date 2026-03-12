@@ -32,7 +32,7 @@ export const getDesignTokens = (mode) => {
             },
             background: {
               default: "#FFFFFF",
-              dim: "#e0e0e0",
+              dim: "#e9e9e9",
             },
           }
         : {
